@@ -32,7 +32,7 @@ defval('buf',0)
 if ~isstr(res) % Not a demo
 
   % The directory where you keep the coordinates
-  whereitsat=fullfile(getenv('IFILES'),'GLACIERS','RGI_3_2');
+   whereitsat=fullfile(getenv('IFILES'),'GLACIERS','RGI_3_2');
 
   % Revert to original name if unbuffered
   if res==0 && buf==0
