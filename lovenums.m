@@ -16,7 +16,7 @@ function [lkli,lkl]=lovenums(mod,els)
 %        the elastic Love numbers in PREM, linearly interpolated from:
 % lkl    The original table from the model specified as the mod input.
 %
-% Last modified by charig-at-princeton.edu, 01/25/2010
+% Last modified by charig-at-princeton.edu, 11/08/2013
 % Last modified by fjsimons-at-alum.mit.edu, 02/21/2012
 
 % Only one option, really
@@ -24,8 +24,14 @@ defval('mod','Wahr')
 
 switch mod
   case 'Wahr'
+      % Note: in the Wahr et al. (1998) paper the Love number for degree
+      % one is reported as 0.027.  However, since we use this conversion
+      % mostly with GRACE data, we have changed the number for degree 1 to
+      % be 0.021.  This is the reported value for using the degree one
+      % coefficients from Swenson et al. (2008).  
+      % See: ftp://podaac.jpl.nasa.gov/allData/tellus/L2/degree_1/deg1_coef.txt
     lkl=[0    0.000;
-	 1    0.027;
+	 1    0.021;
 	 2   -0.303;
 	 3   -0.194;
 	 4   -0.132;
@@ -47,6 +53,11 @@ switch mod
 	 200 -0.007];
  otherwise
   error('Specify valid Love number table')
+end
+
+if max(els) > 200
+   lkl = [lkl; 500 0];
+   disp('Caution: degrees above have been crudely estimated.')
 end
 
 % Now interpolate to where you want them

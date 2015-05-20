@@ -41,7 +41,7 @@ function lmcosi=plm2pot(lmcosi,r,GM,a,wat,wit)
 % geoid, then convert back, making a plot of all 3.  Panel 1 and 3 should
 % be the same.  Panel 2 should be more smoothed.
 %
-% Last modified by charig-at-princeton.edu, 02/23/2012
+% Last modified by charig-at-princeton.edu, 05/14/2015
 % Last modified by kwlewis-at-princeton.edu, 02/23/2012
 % Last modified by fjsimons-at-alum.mit.edu, 05/24/2013
 
@@ -119,9 +119,12 @@ if ~isstr(lmcosi)
 	    1 0 0 0 repmat(0,1,size(lmcosi,2)-4); % Degree 1 order 0
 	    1 1 0 0 repmat(0,1,size(lmcosi,2)-4); % Degree 1 order 1
 	    lmcosi]; % Then the rest
+    fact = [1 1; 1 1; 1 1;
+        fact];
   elseif lmcosi(1)==1 && lmcosi(1,2)==0
     lmcosi=[0 0 GMr 0 repmat(0,1,size(lmcosi,2)-4); % Degree 0
 	    lmcosi]; % Then the rest
+    fact = [1 1; fact];
   end
 
   switch wit

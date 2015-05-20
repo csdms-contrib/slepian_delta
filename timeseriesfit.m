@@ -290,7 +290,7 @@ if polys == 2 || polys == 3
    ftests = [0 P2ftest P3ftest];
    varns={thefits,thedeltas,params,paramerrors,ftests};
 else
-   varns={thefits,thedeltas,params,paramerrors};
+   varns={thefits,thedeltas,params,paramerrors,[0]};
 end
 varargout=varns(1:nargout);
 

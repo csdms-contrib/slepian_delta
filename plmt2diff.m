@@ -9,6 +9,7 @@ function plmt2diff(month1,month2,Lf)
 % Chile? 91,92
 %
 % Last modified by fjsimons-at-alum.mit.edu, 01/14/2013
+% Last modified by charig-at-princeton.edu, 05/14/2015
 
 defval('month1',82);
 defval('month2',88);
@@ -16,7 +17,7 @@ defval('month2',88);
 defval('Lf',18);
 
 clear plmt
-defval('plmt',fullfile(getenv('IFILES'),'GRACE','CSR_alldata.mat'))
+defval('plmt',fullfile(getenv('IFILES'),'GRACE','CSR_RL05_alldata.mat'))
 a=load(plmt);
 % These are the potential coefficients
 plmt=a.potcoffs(:,:,1:4);
