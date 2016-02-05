@@ -1,5 +1,5 @@
 function varargout=grace2slept(Dataproduct,TH,XY_buffer,Lwindow,phi,theta,omega,J,units,forcenew)
-% [slepcoffs,calerrors,thedates,G,CC,V]
+% [slepcoffs,calerrors,thedates,TH,G,CC,V]
 %                 =GRACE2SLEPT(Dataproduct,TH,XY_buffer,Lwindow,phi,theta,omega,J,units,forcenew)
 %
 % This program reads in the Level-2 GRACE geoid products from either the CSR or
@@ -64,7 +64,7 @@ function varargout=grace2slept(Dataproduct,TH,XY_buffer,Lwindow,phi,theta,omega,
 %
 % SEE ALSO: PLM2SLEP
 %
-% Last modified by charig-at-princeton.edu, 1/22/2014
+% Last modified by charig-at-princeton.edu, 02/05/2016
 % Last modified by fjsimons-at-alum.mit.edu, 06/26/2012
 
 % Determine parameters and set defaults
