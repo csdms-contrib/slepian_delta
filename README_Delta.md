@@ -74,38 +74,44 @@ computing resources and run much faster than otherwise.
 ##Function List:
 
 ###Administrative
- - LICENSE.txt
- - README.md
- - README_Delta.md
+| | |
+| --- | --- |
+| LICENSE.txt | The license file |
+| README.md | The masthead for the package |
+| README_Delta.md | This file! |
 
 ###Geographic
- - baffing.m  An outline for a region encompassing the glaciers around Baffin Island
- - ellesmereg.m  An outline for a region encompassing the glaciers around Ellesmere Island
- - getglaciers.m
+| | |
+| --- | --- |
+| baffing.m | An outline for a region encompassing the glaciers around Baffin Island |
+| ellesmereg.m | An outline for a region encompassing the glaciers around Ellesmere Island |
+| getglaciers.m | Return the XY coordinates for glaciers from the Randolph Glacier Inventory |
 
 ###Analysis
- - Clmlmp2Cab.m
- - Clmlmp2Crrp.m
- - cov2plm.m
- - geopotential.m
- - grace2plmt.m
- - grace2slept.m
- - grs.m
- - hash.m
- - integratebasis.m
- - lovenums.m
- - periodfit.m
- - plm2avg.m
- - plm2pot.m
- - plmresid2cov.m
- - plmt2diff.m
- - plmt2resid.m
- - POMME4.m
- - resid2plot.m
- - slepresid2cov.m
- - slept2resid.m
- - timeseriesfit.m
- - topography.m
+| | |
+| --- | --- |
+| Clmlmp2Cab.m | Given a spectral covariance matrix, turns it into a Slepian covariance matrix |
+| Clmlmp2Crrp.m | Given a spectral covariance matrix, evaluates it in space |
+| cov2plm.m | Given a spectral covariance matrix, generates spherical harmonics realizations |
+| geopotential.m | Plots geopotential fields for Earth, Moon and Mars |
+| grace2plmt.m | Turns monthly GRACE data files into a single matrix for time-dependent analysis |
+| grace2slept.m | Transform the result of GRACE2PLMT into a Slepian basis
+| grs.m | Computes parameters for a certain geodetic reference system
+| hash.m | Makes a hash (NOTE: This is one of the few files not written by us! It was made by Michael Kleder) |
+| integratebasis.m | Integrates Slepian eigenfunctions given as spherical harmonics expansions 
+| lovenums.m | Returns elastic Love numbers for a certain Earth model
+| periodfit.m | Find and fit periodic cycles through a data set
+| plm2avg.m | Integrates and averages spherical harmonic expansions 
+| plm2pot.m | Reads in and scales geopotential coeffficients
+| plmresid2cov.m | Turns GRACE residual time series into a spherical-harmonic spectral covariance matrix 
+| plmt2diff.m | Turns monthly GRACE data matrix into a month-to-month difference map
+| plmt2resid.m | Turns monthly GRACE data matrix into residuals after fitting analysis in the spherical harmonic basis
+| POMME4.m | Reads in and scales geomagnetic coeffficients of the POMME-4 model
+| resid2plot.m | Plots GRACE residual time series
+| slepresid2cov.m | Turns GRACE residual time series into a Slepian covariance matrix 
+| slept2resid.m | Turns monthly GRACE data matrix into residuals after fitting in the Slepian basis 
+| timeseriesfit.m | Fits polynomial functions to time series with an F-test criterion 
+| topography.m | Plots topography fields for Earth, Moon and Mars
 
 
 
