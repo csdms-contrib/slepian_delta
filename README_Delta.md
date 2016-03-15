@@ -100,6 +100,8 @@ computing resources and run much faster than otherwise.
 | hash.m | Makes a hash (NOTE: This is one of the few files not written by us! It was made by Michael Kleder) |
 | integratebasis.m | Integrates Slepian eigenfunctions given as spherical harmonics expansions 
 | lovenums.m | Returns elastic Love numbers for a certain Earth model
+| net2mat.m | Saves specified variables from netcdf files as MAT files |
+| netvarread.m | Read a netcef file and get the variable list in the file |
 | periodfit.m | Find and fit periodic cycles through a data set
 | plm2avg.m | Integrates and averages spherical harmonic expansions 
 | plm2pot.m | Reads in and scales geopotential coeffficients
