@@ -1,3 +1,4 @@
+##Intro
 Welcome to the README for SLEPIAN_Delta, a set of routines for the
 analysis of GRACE time-variable gravimetry data.
 This package is hosted by CSDMS at
@@ -15,7 +16,7 @@ Proc. Natl. Acad. Sc., 2012, 109 (49) 19934-19937.
 doi:10.1073/pnas.1206785109 
 
 
-Where do I start?
+##Where do I start?
 
 Currently, this package is the most under-development of any of the
 Slepian packages we have released.  At the moment the figure scripts
@@ -77,37 +78,34 @@ computing resources and run much faster than otherwise.
  - README.md
  - README_Delta.md
 
-###Regions
+###Geographic
  - baffing.m  An outline for a region encompassing the glaciers around Baffin Island
+ - ellesmereg.m  An outline for a region encompassing the glaciers around Ellesmere Island
+ - getglaciers.m
 
-Clmlmp2Cab.m
-Clmlmp2Crrp.m
-cov2plm.m
-ellesmereg.m
-geopotential.m
-getglaciers.m
-grace2plmt.m
-grace2slept.m
-grs.m
-hash.m
-integratebasis.m
-LICENSE.txt
-lovenums.m
-periodfit.m
-plm2avg.m
-plm2pot.m
-plmresid2cov.m
-plmt2diff.m
-plmt2resid.m
-POMME4.m
-README_Delta.txt
-README.md
-resid2plot.m
-slepresid2cov.m
-slept2resid.m
-temp
-timeseriesfit.m
-topography.m
+###Analysis
+ - Clmlmp2Cab.m
+ - Clmlmp2Crrp.m
+ - cov2plm.m
+ - geopotential.m
+ - grace2plmt.m
+ - grace2slept.m
+ - grs.m
+ - hash.m
+ - integratebasis.m
+ - lovenums.m
+ - periodfit.m
+ - plm2avg.m
+ - plm2pot.m
+ - plmresid2cov.m
+ - plmt2diff.m
+ - plmt2resid.m
+ - POMME4.m
+ - resid2plot.m
+ - slepresid2cov.m
+ - slept2resid.m
+ - timeseriesfit.m
+ - topography.m
 
 
 
@@ -115,7 +113,7 @@ topography.m
 
 
 
-Other important stuff
+##Other important stuff
 
 This software is distributed under the GNU Public License v2, which can be
 found at http://geoweb.princeton.edu/people/simons/license.html  and also
