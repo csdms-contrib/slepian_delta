@@ -15,8 +15,7 @@ For more information see:
  - [the princeton polar ice website methods](http://polarice.princeton.edu/methods.html)
  - Harig, Christopher and Frederik J. Simons. Mapping Greeenland's
  mass loss in space and time. Proc. Natl. Acad. Sc., 109(49),
- 19934-19937. [doi:10.1073/pnas.1206785109](http://dx.doi.org/10.1073/pnas.1206785109),
- 2012. 
+ 19934-19937. [doi:10.1073/pnas.1206785109](http://dx.doi.org/10.1073/pnas.1206785109), 2012. 
 
 ## Obtain first release
 The first release, 1.0.0 is deposited in Zenodo (http://dx.doi.org/10.5281/zenodo.15706).
