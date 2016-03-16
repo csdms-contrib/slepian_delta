@@ -64,7 +64,7 @@ function varargout=grace2slept(Dataproduct,TH,XY_buffer,Lwindow,phi,theta,omega,
 %
 % SEE ALSO: PLM2SLEP
 %
-% Last modified by charig-at-princeton.edu, 02/05/2016
+% Last modified by charig-at-princeton.edu, 03/16/2016
 % Last modified by fjsimons-at-alum.mit.edu, 06/26/2012
 
 % Determine parameters and set defaults
@@ -82,12 +82,6 @@ defval('inout','out')
 Pcenter = Dataproduct(1:3);
 Rlevel = Dataproduct(4:end);
 
-% Top level directory
-% For Chris
-IFILES=getenv('IFILES');
-% For FJS, who has a different $IFILES
-%IFILES='/u/charig/Data/';
-
 % Figure out if it's lowpass or bandpass
 lp=length(Lwindow)==1;
 bp=length(Lwindow)==2;
@@ -97,9 +91,9 @@ ldim=(Lwindow(2-lp)+1)^2-bp*Lwindow(1)^2;
 defval('J',ldim)
 
 % Where the original data files are kept
-defval('ddir1',fullfile(IFILES,'GRACE','Originals',Rlevel,Pcenter));
+defval('ddir1',fullfile(getenv('IFILES'),'GRACE','Originals',Rlevel,Pcenter));
 % Where you would like to save the new .mat file
-defval('ddir2',fullfile(IFILES,'GRACE','SlepianExpansions'));
+defval('ddir2',fullfile(getenv('IFILES'),'GRACE','SlepianExpansions'));
 
 % Get the remaining file names
 if ~isstr(TH) && length(TH)==1 % POLAR CAPS

@@ -26,18 +26,12 @@ function varargout=Clmlmp2Cab(Clmlmp,TH,eigs)
 %
 % SEE ALSO:
 %
-% Last modified by charig-at-princeton.edu 6/26/2012
+% Last modified by charig-at-princeton.edu 3/16/2016
 
 % Determine parameters and set defaults
 defval('Lwindow',20)
 defval('TH','greenland')
 defval('pars',10)
-
-% Top level directory
-% For Chris
-IFILES=getenv('IFILES');
-% For FJS, who has a different $IFILES
-%IFILES='/u/charig/Data/';
 
 % Determine the bandwidth of our data.  Assume Clmlmp starts at l=0.
 [n,m]=size(Clmlmp);

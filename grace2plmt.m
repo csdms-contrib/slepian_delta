@@ -52,7 +52,7 @@ function varargout=grace2plmt(Pcenter,Rlevel,units,forcenew)
 %
 %
 %
-% Last modified by charig-at-princeton.edu, 02/27/2014
+% Last modified by charig-at-princeton.edu, 03/16/2016
 % Last modified by fjsimons-at-alum.mit.edu, 05/17/2011
 
 % Determine parameters and set defaults
@@ -61,14 +61,8 @@ defval('Rlevel','RL05')
 defval('units','SD')
 defval('forcenew',1)
 
-% Top level directory
-% For Chris
-IFILES=getenv('IFILES');
-% For FJS, who has a different $IFILES
-%IFILES='/u/charig/Data/';
-
 % Where the original data files are kept
-defval('ddir1',fullfile(IFILES,'GRACE','Originals',Rlevel,Pcenter));
+defval('ddir1',fullfile(getenv('IFILES'),'GRACE','Originals',Rlevel,Pcenter));
 
 % Where you would like to save the new .mat file
 defval('ddir2',fullfile(getenv('IFILES'),'GRACE'));
@@ -140,9 +134,9 @@ a=fralmanac('a_EGM96','Earth');
 % our release level. Note, here the 'NH' part describes a no header version
 % of the SLR datafiles.
 if strcmp(Rlevel,'RL04')
-    slrc20=load(fullfile(IFILES,'SLR','C20_RL04_NH.txt'));
+    slrc20=load(fullfile(getenv('IFILES'),'SLR','C20_RL04_NH.txt'));
 elseif strcmp(Rlevel,'RL05')
-    slrc20=load(fullfile(IFILES,'SLR','C20_RL05_NH.txt'));
+    slrc20=load(fullfile(getenv('IFILES'),'SLR','C20_RL05_NH.txt'));
 end
 % The sigma error is column 4
 slrc20_error=slrc20(:,4)*1e-10;
@@ -157,9 +151,9 @@ slrc20(:,2) = slrc20(:,2) - j2;
 
 % Degree 1 Correction Setup
 if Rlevel=='RL04'
-    deg1=load(fullfile(IFILES,'GRACE','deg1_RL04_NH.txt'));
+    deg1=load(fullfile(getenv('IFILES'),'GRACE','deg1_RL04_NH.txt'));
 elseif Rlevel=='RL05'
-    deg1=load(fullfile(IFILES,'GRACE','deg1_RL05_NH.txt'));
+    deg1=load(fullfile(getenv('IFILES'),'GRACE','deg1_RL05_NH.txt'));
 end
 [n,m] = size(deg1);
 dates_str = num2str(deg1(:,1));
