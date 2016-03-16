@@ -24,8 +24,8 @@ function varargout=getglaciers(region)
 %
 % The Randolph Glacier Inventory is found at http://www.glims.org/RGI/.  
 % The data are made available under certain use constraints, and users
-% should consult the website for valid purposes. Structure: unzip the
-% database to
+% should consult the website for valid purposes. 
+% Structure: unzip the database to:
 % $FILES/GLACIERS/RGI_3_2/SHPFILES/??_rgi32_Regionname.[shp,sbn,prj,shx,...]
 % and this code will generate 
 % $FILES/GLACIERS/RGI_3_2/MATFILES/Regionname.mat
@@ -33,13 +33,13 @@ function varargout=getglaciers(region)
 % 
 % Open a MATLABPOOL and this will run in parallel, automatically
 %
-% SEE ALSO: 
+% IMPORTANT: 
 %
 % SHAPEREAD from the mapping toolbox is not sufficient; instead,
 % M_SHAPEREAD from the freeware M_MAP needs to be used
 % (http://www2.ocgy.ubc.ca/~rich/map.html) 
 %
-% Last modified by charig-at-princeton.edu, 09/10/2015
+% Last modified by charig-at-princeton.edu, 03/16/2016
 % Last modified by fjsimons-at-princeton.edu, 09/10/2015
 
 % Determine parameters and set defaults
