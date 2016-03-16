@@ -92,14 +92,18 @@ computing resources and run much faster than otherwise.
 | --- | --- |
 | Clmlmp2Cab.m | Given a spectral covariance matrix, turns it into a Slepian covariance matrix |
 | Clmlmp2Crrp.m | Given a spectral covariance matrix, evaluates it in space |
+| coarsenmask.m | Given a spatial mask, coarsen its resolution by several methods |
 | cov2plm.m | Given a spectral covariance matrix, generates spherical harmonics realizations |
 | geopotential.m | Plots geopotential fields for Earth, Moon and Mars |
+| getglaciers.m | Get XY coordinates for glaciers in RGI database |
+| gldas2TWSt.m | Read the GLDAS products and calculate Terrestrial Water Storage (TWS) fields |
 | grace2plmt.m | Turns monthly GRACE data files into a single matrix for time-dependent analysis |
 | grace2slept.m | Transform the result of GRACE2PLMT into a Slepian basis
 | grs.m | Computes parameters for a certain geodetic reference system
 | hash.m | Makes a hash (NOTE: This is one of the few files not written by us! It was made by Michael Kleder) |
-| integratebasis.m | Integrates Slepian eigenfunctions given as spherical harmonics expansions 
-| lovenums.m | Returns elastic Love numbers for a certain Earth model
+| integratebasis.m | Integrates Slepian eigenfunctions given as spherical harmonics expansions |
+| lovenums.m | Returns elastic Love numbers for a certain Earth model |
+| maskfromgmt.m | Given a grid and polgon, generate a gridded mask using Generic Mapping Tools |
 | net2mat.m | Saves specified variables from netcdf files as MAT files |
 | netvarread.m | Read a netcef file and get the variable list in the file |
 | periodfit.m | Find and fit periodic cycles through a data set
@@ -109,12 +113,13 @@ computing resources and run much faster than otherwise.
 | plmt2diff.m | Turns monthly GRACE data matrix into a month-to-month difference map
 | plmt2resid.m | Turns monthly GRACE data matrix into residuals after fitting analysis in the spherical harmonic basis
 | POMME4.m | Reads in and scales geomagnetic coeffficients of the POMME-4 model
+| readgldas.m | Read in the GLDAS products and save them in Matlab friendly formats |
 | resid2plot.m | Plots GRACE residual time series
 | slepresid2cov.m | Turns GRACE residual time series into a Slepian covariance matrix 
 | slept2resid.m | Turns monthly GRACE data matrix into residuals after fitting in the Slepian basis 
 | timeseriesfit.m | Fits polynomial functions to time series with an F-test criterion 
 | topography.m | Plots topography fields for Earth, Moon and Mars
-
+| TWSt2slept.m | Project the TWS fields you previously made into a Slepian basis |
 
 
 
