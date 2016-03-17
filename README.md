@@ -9,7 +9,7 @@ mission.
 ## More Information
 
 For more information see:
- - [README_Delta](https://github.com/csdms-contrib/slepian_delta/blob/master/README_Delta.txt)
+ - [README_Delta](https://github.com/csdms-contrib/slepian_delta/blob/master/README_Delta.md)
  for mini-instructions on how to use this package as well as a
  function list  
  - [the princeton polar ice website methods](http://polarice.princeton.edu/methods.html)
