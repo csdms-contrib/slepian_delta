@@ -25,13 +25,17 @@ function varargout=integratebasis(CC,TH,J,phi,theta)
 % SEE ALSO: PLM2AVG, PLM2AVGP
 %
 %
-% Last modified by charig-at-princeton.edu, 9/17/2014
+% Last modified by charig-at-email.arizona.edu, 11/1/2016
 
 
 defval('TH','africa')  
 defval('CC','[~,CC]=localization(15,TH);');
 defval('phi',0)
 defval('theta',0)
+
+%%%
+% Initilization
+%%%
 
 % Sort out what CC is
 if isstr(CC)
@@ -70,31 +74,43 @@ end
 
 % Now sort out what TH is
 if isstr(TH) % Geographic, we just do it
-    if strcmp(TH,'antarctica') || strcmp(TH,'antarcticaG') || strcmp(TH,'eantarctica')...
-            || strcmp(TH,'eantarcticaIntG') || strcmp(TH,'eantarcticaCoasts1') ...
-            || strcmp(TH,'eantarcticaCoasts2')
-        
-         [XY,lonc,latc]=eval(sprintf('%s(%i)',TH,10));
-         [thetap,phip,rotmats]=rottp((90-XY(:,2))*pi/180,XY(:,1)*pi/180,-lonc*pi/180,latc*pi/180,0);
-         lonp = phip*180/pi;
-         latp = 90-thetap*180/pi;
-         [latf,lonf] = flatearthpoly(latp,lonp);
-         XY=[lonf latf];
+    % Lets check if we need to do a rotation. The function for your
+    % coordinates should have this functionality if it's needed.
+    defval('rotb',0);
+    try
+	  rotb=eval(sprintf('%s(''rotated'')',TH));    
+    end
+      
+    % Now do the rotation if needed
+    if length(rotb)==1 && rotb
+      % Get the rotation parameters to rotate. Note, the region
+      % rotation angles that we return from the functions (lonc, latc)
+      % are the same regardless of if we did a buffer, as they pertain
+      % to the original region    
+      [XY,lonc,latc]=eval(sprintf('%s(%i)',TH,10));
+      [thetap,phip,rotmats]=rottp((90-XY(:,2))*pi/180,XY(:,1)*pi/180,-lonc*pi/180,latc*pi/180,0);
+      lonp = phip*180/pi;
+      latp = 90-thetap*180/pi;
+      [latf,lonf] = flatearthpoly(latp,lonp);
+      XY=[lonf latf];
     else  
-         % No changes
-         XY=TH;
+      % No changes
+      XY=TH;
     end
 elseif iscell(TH) % Geographic + buffer
     defval('buf',0);
     dom=TH{1}; buf=TH{2};
 	defval('pars',10);
-	% Run the named function to return the coordinates	
-    if strcmp(TH{1},'antarctica') || strcmp(TH{1},'antarcticaG') || ...
-            strcmp(TH{1},'antarcticaGP') || strcmp(TH{1},'eantarctica') ||...
-            strcmp(TH{1},'eantarcticaIntG') || strcmp(TH{1},'eantarcticaIntGOceanBuf') ||...
-            strcmp(TH{1},'eantarcticaCoasts1') || strcmp(TH{1},'eantarcticaCoasts1OceanBuf') ||...
-            strcmp(TH{1},'eantarcticaCoasts2') || strcmp(TH{1},'eantarcticaCoasts2OceanBuf')
-        
+    % Lets check if we need to do a rotation. The function for your
+    % coordinates should have this functionality if it is needed.
+    defval('rotb',0);
+    try
+	  rotb=eval(sprintf('%s(''rotated'')',dom));    
+    end
+    
+    % Now do the rotation if needed
+    if length(rotb)==1 && rotb
+          % Return the coordinates and do the rotation
          [XY,lonc,latc]=eval(sprintf('%s(%i,%f)',TH{1},10,TH{2}));
          [thetap,phip,rotmats]=rottp((90-XY(:,2))*pi/180,XY(:,1)*pi/180,-lonc*pi/180,latc*pi/180,0);
          lonp = phip*180/pi;
@@ -104,14 +120,15 @@ elseif iscell(TH) % Geographic + buffer
     else
 	     XY=eval(sprintf('%s(%i,%f)',dom,pars,buf));
     end
-elseif isfloat(TH) && length(TH)==1 % Polar caps
+elseif isfloat(TH) && length(TH)==1 
+    % We have Polar caps
     XY = [ [1:360]' repmat(90-TH,360,1) ]; 
     [thetap,phip,rotmats]=rottp((90-XY(:,2))*pi/180,XY(:,1)*pi/180,0,-theta*pi/180,-phi*pi/180);
     lonp = phip*180/pi;
     latp = 90-thetap*180/pi;
     XY=[lonp latp];
 else
-    % Must be coordinates
+    % Must be straight coordinates
     XY=TH;
 end
 
@@ -121,13 +138,11 @@ end
 % Do it
 %%%
 
-% Parfor is a built in function, so we can just use it, and if someone
-% doesn't have the toolbox it will just run like a normal for loop.
+% Run parallel is we are able
 parfor h=1:J
   [Int,A]=plm2avg(CC{h},XY);
   eigfunINT(h) = Int;
 end
-
 
 % Collect output
 varns={eigfunINT};

@@ -50,8 +50,11 @@ defval('forcenew',0);
 defval('masked',1);
 % Any variables used in a parfor loop must be explicitly assigned during a
 % function call.  i.e. using the ASSIGNIN function will not work
+% Hence why we do this roundabout assigning for L
 TWSpadding = [30 360];
-L = 60;
+defval('L',60)
+dimK = (L+1)^2;
+L = sqrt(dimK) - 1;
 
 % Some specific handling for the spatial resolution
 if gldasres==0.25
@@ -120,6 +123,10 @@ else
       [lonlon,latlat]=meshgrid([c11cmn(1):gldasres:c11cmn(3)],[c11cmn(2):-gldasres:c11cmn(4)]);
     end
 
+    % Here we make a preemptive call to DLMB because if you do not have
+    % this data saved before starting the parfor loop then you will get an
+    % error trying to read a file which is not finished being created.
+    [~] = dlmb(L);
     % Multiply the mask to Total Water Storage in order to remove areas 
     % with permanent land ice.
     parfor i=1:length(thedates)
