@@ -37,7 +37,7 @@ function varargout=gldas2TWSt(version,gldasres,timeres,forcing,masked,forcenew)
 %
 % See also: READGLDAS, GETGLACIERS, MASKFROMGMT, COARSENMASK, NET2MAT
 %
-% Last modified by charig-at-princeton.edu, 03/16/2016
+% Last modified by charig-at-princeton.edu, 11/01/2016
 
 % Set some defaults
 defval('version','GLDAS1');

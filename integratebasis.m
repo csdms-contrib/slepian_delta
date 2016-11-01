@@ -25,7 +25,7 @@ function varargout=integratebasis(CC,TH,J,phi,theta)
 % SEE ALSO: PLM2AVG, PLM2AVGP
 %
 %
-% Last modified by charig-at-email.arizona.edu, 11/1/2016
+% Last modified by charig-at-email.arizona.edu, 11/01/2016
 
 
 defval('TH','africa')  
