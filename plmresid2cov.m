@@ -21,7 +21,7 @@ function varargout=plmresid2cov(ESTresid,L,imonths)
 %
 % EXAMPLE:
 %
-% resid2cov('demo1') % Also makes a plot
+% plmresid2cov('demo1') % Also makes a plot
 %
 % Last modified by fjsimons-at-alum.mit.edu, 06/26/2011
 % Last modified by charig-at-princeton.edu, 06/26/2011
@@ -78,7 +78,7 @@ if ~isstr(ESTresid)
 
 elseif strcmp(ESTresid,'demo1')
   % Get the default matrix
-  [Clmlmp,Clmlmpr,Clmlmpd,EL,EM]=resid2cov([],20);
+  [Clmlmp,Clmlmpr,Clmlmpd,EL,EM]=plmresid2cov([],20);
   % Overkill in a way, but get the dates also, make it fast
   [~,thedates]=plmt2resid([]);
   % Maximum degree of the expansion
