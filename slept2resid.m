@@ -1,4 +1,4 @@
-function varargout=slept2resid(slept,thedates,fitwhat,givenerrors,specialterms,CC,TH)
+function varargout=slept2resid(slept,thedates,fitwhat,givenerrors,specialterms,CC,TH,N)
 % [ESTsignal,ESTresid,ftests,extravalues,total,alphavarall,totalparams,
 %    totalparamerrors,totalfit,functionintegrals,alphavar]
 %       =SLEPT2RESID(slept,thedates,fitwhat,givenerrors,specialterms,CC,TH)
@@ -51,6 +51,8 @@ function varargout=slept2resid(slept,thedates,fitwhat,givenerrors,specialterms,C
 % CC           A cell array of the localization Slepian functions
 % TH           The region (proper string or XY coordinates) that you did the
 %               localization on (so we can integrate)
+% N          Number of largest eigenfunctions in which to expand.  By default
+%             rounds to the Shannon number.
 %            
 % OUTPUT:
 %
@@ -488,7 +490,7 @@ if nargout >= 5 && exist('CC') && exist('TH')
        XY=TH;
     end
     % Calculate the Shannon number for this basis
-    N=round((L+1)^2*spharea(XY));
+    defval('N',round((L+1)^2*spharea(XY)));
     
     % Make the coefficients with reference to some mean
     % If they already are, then this won't matter
