@@ -31,7 +31,7 @@ function varargout=getglaciers(region)
 % $FILES/GLACIERS/RGI_3_2/MATFILES/Regionname.mat
 % and after running it, will bybass the SHPFILES directory.
 % 
-% Open a MATLABPOOL and this will run in parallel, automatically
+% Open a PARPOOL and this will run in parallel, automatically
 %
 % IMPORTANT: 
 %
