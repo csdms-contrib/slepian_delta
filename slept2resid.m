@@ -536,13 +536,12 @@ if nargout >= 5 && exist('CC') && exist('TH')
     % pass the new error to our function for replacement, so
     % that the fitting confidence intervals reflect that  
     
-    [fit,delta,params,paramerrors] = timeseriesfit([thedates' total'],alphavarall,1,1);
+    [fit,delta,totalparams,paramerrors] = timeseriesfit([thedates' total'],alphavarall,1,1);
     
     % Make a matrix for the line, and 95% confidence in the fit
     totalfit = [thedates' fit delta];
 
-    % Make the parameters and error valid for a year
-    totalparams = params(2)*365;
+    % Make the error valid for a year
     totalparamerrors = paramerrors*365;
 
     % Collect the expanded output
