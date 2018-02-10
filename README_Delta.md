@@ -1,4 +1,4 @@
-##Intro
+## Intro
 Welcome to the README for SLEPIAN_Delta, a set of routines for the
 analysis of GRACE time-variable gravimetry data.
 This package is hosted by CSDMS at
@@ -16,7 +16,7 @@ Proc. Natl. Acad. Sc., 2012, 109 (49) 19934-19937.
 doi:10.1073/pnas.1206785109 
 
 
-##Where do I start?
+## Where do I start?
 
 Currently, this package is the most under-development of any of the
 Slepian packages we have released.  At the moment the figure scripts
@@ -71,23 +71,23 @@ computing resources and run much faster than otherwise.
 
 
 
-##Function List:
+## Function List:
 
-###Administrative
+### Administrative
 | | |
 | --- | --- |
 | LICENSE.txt | The license file |
 | README.md | The masthead for the package |
 | README_Delta.md | This file! |
 
-###Geographic
+### Geographic
 | | |
 | --- | --- |
 | baffing.m | An outline for a region encompassing the glaciers around Baffin Island |
 | ellesmereg.m | An outline for a region encompassing the glaciers around Ellesmere Island |
 | getglaciers.m | Return the XY coordinates for glaciers from the Randolph Glacier Inventory |
 
-###Analysis
+### Analysis
 | | |
 | --- | --- |
 | Clmlmp2Cab.m | Given a spectral covariance matrix, turns it into a Slepian covariance matrix |
@@ -126,7 +126,7 @@ computing resources and run much faster than otherwise.
 
 
 
-##Other important stuff
+## Other important stuff
 
 This software is distributed under the GNU Public License v2, which can be
 found at http://geoweb.princeton.edu/people/simons/license.html  and also
