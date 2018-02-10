@@ -24,7 +24,8 @@ as in the other packages are not posted for SLEPIAN_Delta.  However,
 here is a short workflow for this package taken from 
 http://polarice.princeton.edu/methods.html
 
-Slepian localization and GRACE: a recipe 
+### Slepian localization and GRACE: a recipe
+
 Here is a general outline to study regions and signals in GRACE data.
 
 1. Set up your data and directory structure, and then with GRACE2PLMT 
@@ -41,7 +42,7 @@ leakage/recovery tradeoffs.
 3. Next run SLEPT2RESID to fit a choice of functions (e.g. lines, 
 quadratics, etc.) to the Slepian coefficients. Note: if you want to 
 remove a model of GIA then you should do that before this step, using 
-a function like CORRECT4PGR.
+a function like CORRECT4GIA.
 
 4. If you want to examine the total mass trend in a region, this 
 information is calculated and returned as a result from SLEPT2RESID. 
