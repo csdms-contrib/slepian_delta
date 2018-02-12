@@ -20,7 +20,7 @@ function varargout=grace2plmt(Pcenter,Rlevel,units,forcenew)
 %              Either 'RL04' or 'RL05'
 % units       'POT' or 'SD' for whether you want geopotential or surface
 %               mass density
-% forcenew    Wether or not you want to force new generation of a save file
+% forcenew    Whether or not you want to force new generation of a save file
 %              (1) or just use the one we already have (0) [default].
 %
 % OUTPUT:
