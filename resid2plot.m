@@ -1,5 +1,5 @@
 function varargout=resid2plot(ESTresid,thedates,ESTsignal,l,m,varet,calerrors)
-% []=RESID2PLOT(ESTresid,thedates,ESTsignal,l,m,varet,calerrors)
+% RESID2PLOT(ESTresid,thedates,ESTsignal,l,m,varet,calerrors)
 %
 % INPUT: 
 % ESTresid    Residual time series for each pair of cos/sin coefficients
