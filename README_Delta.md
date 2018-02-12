@@ -1,4 +1,4 @@
-##Intro
+## Intro
 Welcome to the README for SLEPIAN_Delta, a set of routines for the
 analysis of GRACE time-variable gravimetry data.
 This package is hosted by CSDMS at
@@ -16,7 +16,7 @@ Proc. Natl. Acad. Sc., 2012, 109 (49) 19934-19937.
 doi:10.1073/pnas.1206785109 
 
 
-##Where do I start?
+## Where do I start?
 
 Currently, this package is the most under-development of any of the
 Slepian packages we have released.  At the moment the figure scripts
@@ -24,7 +24,8 @@ as in the other packages are not posted for SLEPIAN_Delta.  However,
 here is a short workflow for this package taken from 
 http://polarice.princeton.edu/methods.html
 
-Slepian localization and GRACE: a recipe 
+### Slepian localization and GRACE: a recipe
+
 Here is a general outline to study regions and signals in GRACE data.
 
 1. Set up your data and directory structure, and then with GRACE2PLMT 
@@ -41,7 +42,7 @@ leakage/recovery tradeoffs.
 3. Next run SLEPT2RESID to fit a choice of functions (e.g. lines, 
 quadratics, etc.) to the Slepian coefficients. Note: if you want to 
 remove a model of GIA then you should do that before this step, using 
-a function like CORRECT4PGR.
+a function like CORRECT4GIA.
 
 4. If you want to examine the total mass trend in a region, this 
 information is calculated and returned as a result from SLEPT2RESID. 
@@ -71,23 +72,23 @@ computing resources and run much faster than otherwise.
 
 
 
-##Function List:
+## Function List:
 
-###Administrative
+### Administrative
 | | |
 | --- | --- |
 | LICENSE.txt | The license file |
 | README.md | The masthead for the package |
 | README_Delta.md | This file! |
 
-###Geographic
+### Geographic
 | | |
 | --- | --- |
 | baffing.m | An outline for a region encompassing the glaciers around Baffin Island |
 | ellesmereg.m | An outline for a region encompassing the glaciers around Ellesmere Island |
 | getglaciers.m | Return the XY coordinates for glaciers from the Randolph Glacier Inventory |
 
-###Analysis
+### Analysis
 | | |
 | --- | --- |
 | Clmlmp2Cab.m | Given a spectral covariance matrix, turns it into a Slepian covariance matrix |
@@ -126,7 +127,7 @@ computing resources and run much faster than otherwise.
 
 
 
-##Other important stuff
+## Other important stuff
 
 This software is distributed under the GNU Public License v2, which can be
 found at http://geoweb.princeton.edu/people/simons/license.html  and also
