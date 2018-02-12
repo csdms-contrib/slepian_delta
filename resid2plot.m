@@ -1,6 +1,5 @@
 function varargout=resid2plot(ESTresid,thedates,ESTsignal,l,m,varet,calerrors)
-% [ESTresid,thedates,ESTsignal,rmset,rmsst,varet,varst]
-%             =RESID2PLOT(plmt,thedates,fitwhat,givenerrors)
+% []=RESID2PLOT(ESTresid,thedates,ESTsignal,l,m,varet,calerrors)
 %
 % INPUT: 
 % ESTresid    Residual time series for each pair of cos/sin coefficients
@@ -11,11 +10,11 @@ function varargout=resid2plot(ESTresid,thedates,ESTsignal,l,m,varet,calerrors)
 %             ESTresid(:,:,4) the sine coefficient
 % thedates    The dates that belong to these time series 
 %               (in Matlab DATENUM format)
-% l           The degree you want plotted [default: random]
-% m           The order you want plotted  [default: random]
 % ESTsignal   The estimated signal function for each cos/sin
 %             coefficient evaluated at those months in the same format.  
 %             This is optional if you want it plotted as well. 
+% l           The degree you want plotted [default: random]
+% m           The order you want plotted  [default: random]
 % varet       The variance of the estimated residual coefficients.  If you
 %               have these, they are plotted.  If not, they are estimated 
 %               from the time series.
