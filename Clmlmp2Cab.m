@@ -2,7 +2,7 @@ function varargout=Clmlmp2Cab(Clmlmp,TH,eigs)
 % [Cab,Cab_scaled,G,V]=CLMLMP2CAB(Clmlmp,TH,eigs)
 %
 % Takes a spherical harmonic covariance matrix and calculates the
-% covariance of a desired Slepian basis. (Cab = G*Clmlmp*G')  The Slepian
+% covariance of a desired Slepian basis. (Cab = G'*Clmlmp*G)  The Slepian
 % basis will be the same bandwidth as the spectral covariance data
 %
 % INPUT:
