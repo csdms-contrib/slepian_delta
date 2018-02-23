@@ -104,10 +104,10 @@ function varargout=slept2resid(slept,thedates,fitwhat,givenerrors,specialterms,C
 %
 % Last modified by charig-at-princeton.edu  6/26/2012
 
-defval('xver',0)  
+defval('xver',0);  
 %defval('specialterms',{2 'periodic' 1728.1});
 defval('specialterms',{NaN});
-defval('slept','grace2slept(''CSR'',''greenland'',0.5,60,[],[],[],[],''SD'')')
+defval('slept','grace2slept(''CSR'',''greenland'',0.5,60,[],[],[],[],''SD'')');
 defval('extravalues',[]);
 
 if isstr(slept)
@@ -117,7 +117,9 @@ end
 
 % Initialize/Preallocate
 defval('givenerrors',ones(size(slept)));
-defval('fitwhat',[3 365.0])
+defval('fitwhat',[3 365.0]);
+defval('P2ftest',0);
+defval('P3ftest',0);
 
 % Handle the dates
 if length(thedates)==size(slept,1)
