@@ -61,7 +61,7 @@ function varargout=slept2resid(slept,thedates,fitwhat,givenerrors,specialterms,C
 % ESTresid    Residual time series for each Slepian coefficients, ordered 
 %              as they were given, presumably by eigenvalue
 %              [nmonths x (Lwindow+1)^2] 
-% ftests       An matrix, such as [0 1 1] for each Slepian coefficient, 
+% ftests       A matrix, such as [0 1 1] for each Slepian coefficient, 
 %                 on whether the fits you
 %                 requested passed an F-test for significance.
 % extravalues  These are the values of ESTsignal evaluated at your extra
