@@ -137,8 +137,6 @@ if ~isstr(lmcosi)
   end
   
   % Factor in the factor for everything else after this
-%   disp(size(lmcosi))
-%   disp(size(fact))
   lmcosi(:,3:4)=fact.*lmcosi(:,3:4);
   
 elseif strcmp(lmcosi,'demo1')
@@ -161,7 +159,7 @@ elseif strcmp(lmcosi,'demo1')
   cb=colorbar('hor');
   shrink(cb,1.5,2)
   movev(cb,-0.05)
-  %axes(cb)
+  axes(cb)
   set(get(cb,'xlabel'),'string','Surface density [kg/m^2]');
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   axes(ah(2))
@@ -174,7 +172,7 @@ elseif strcmp(lmcosi,'demo1')
   cb=colorbar('hor');
   shrink(cb,1.5,2)
   movev(cb,-0.05)
-  %axes(cb)
+  axes(cb)
   set(get(cb,'xlabel'),'string','Geoid height variation [milimeters]');
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   axes(ah(3))
@@ -185,7 +183,7 @@ elseif strcmp(lmcosi,'demo1')
   cb=colorbar('hor');
   shrink(cb,1.5,2)
   movev(cb,-0.05)
-  %axes(cb)
+  axes(cb)
   set(get(cb,'xlabel'),'string','Surface density [kg/m^2]');
 end
 
