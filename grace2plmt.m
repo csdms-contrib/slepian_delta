@@ -96,6 +96,13 @@ if strcmp(Pcenter,'GFZ')
         errornames=ls2cell(fullfile(ddir1,'GSM*G---_005a.txt'));
         % Know a priori what the bandwidth of the coefficients is
         Ldata=90;
+    elseif strcmp(Rlevelm,'RL06')
+        %find the coefficient file names
+        datanames=ls2cell(fullfile(ddir1,'GSM*G---_006a'));
+        %Find the error files
+        errornames=ls2cell(fullfile(ddir1),'GSM*G---_006a.txt'));
+        %Know a priori what the bandwith of the coefficients is
+        Ldata=60;
     end      
 elseif  strcmp(Pcenter,'CSR')
     if strcmp(Rlevel,'RL04')
@@ -105,6 +112,8 @@ elseif  strcmp(Pcenter,'CSR')
        datanames=ls2cell(fullfile(ddir1,'GSM*0060_0005'));
        % CSR Release Level 5 has no calibrated error files
        %errornames=ls2cell(fullfile(ddir1,'GSM*0060_0005.txt'));
+    elseif strcmp(Rlevel,'RL06')
+        datanames=ls2cell(fullfile(ddir1,'GSM*0060_0006'));
     end
    % Know a priori what the bandwidth of the coefficients is
    Ldata=60;
@@ -115,6 +124,8 @@ elseif  strcmp(Pcenter,'JPL')
        %errornames=ls2cell(fullfile(ddir1,'GSM*0060_0004.txt'));
     else
         error('JPL RL04 solutions not currently stored');
+    elseif strcmp(Rlevel,'RL05');
+        datanames=ls2cell(fullfile(ddir1,'GSM*JPLEM*005'));
     end
    % Know a priori what the bandwidth of the coefficients is
    Ldata=90;
@@ -137,6 +148,8 @@ if strcmp(Rlevel,'RL04')
     slrc20=load(fullfile(getenv('IFILES'),'SLR','C20_RL04_NH.txt'));
 elseif strcmp(Rlevel,'RL05')
     slrc20=load(fullfile(getenv('IFILES'),'SLR','C20_RL05_NH.txt'));
+elseif strcmp(Rlevel,'RL06')
+    slrc20=load(fullfile(getenv('IFILES'),'SLR','C20_RL06_NH.txt'));
 end
 % The sigma error is column 4
 slrc20_error=slrc20(:,4)*1e-10;
@@ -154,6 +167,8 @@ if Rlevel=='RL04'
     deg1=load(fullfile(getenv('IFILES'),'GRACE','deg1_RL04_NH.txt'));
 elseif Rlevel=='RL05'
     deg1=load(fullfile(getenv('IFILES'),'GRACE','deg1_RL05_NH.txt'));
+elseif Rlevel=='RL06'
+    deg1=load(fullfile(getenv('IFILES'),'GRACE','deg1_RL06_NH.txt'));
 end
 [n,m] = size(deg1);
 dates_str = num2str(deg1(:,1));
