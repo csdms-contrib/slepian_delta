@@ -100,7 +100,7 @@ if strcmp(Pcenter,'GFZ')
         %find the coefficient file names
         datanames=ls2cell(fullfile(ddir1,'GSM*G---_006a'));
         %Find the error files
-        errornames=ls2cell(fullfile(ddir1),'GSM*G---_006a.txt'));
+        errornames=ls2cell(fullfile(ddir1),'GSM*G---_006a.txt');
         %Know a priori what the bandwith of the coefficients is
         Ldata=60;
     end      
@@ -124,8 +124,8 @@ elseif  strcmp(Pcenter,'JPL')
        %errornames=ls2cell(fullfile(ddir1,'GSM*0060_0004.txt'));
     else
         error('JPL RL04 solutions not currently stored');
-    elseif strcmp(Rlevel,'RL05');
-        datanames=ls2cell(fullfile(ddir1,'GSM*JPLEM*005'));
+    %elseif strcmp(Rlevel,'RL05');
+    %    datanames=ls2cell(fullfile(ddir1,'GSM*JPLEM*005'));
     end
    % Know a priori what the bandwidth of the coefficients is
    Ldata=90;
