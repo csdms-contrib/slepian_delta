@@ -55,8 +55,8 @@ function varargout=grace2plmt(Pcenter,Rlevel,units,forcenew)
 % [potcoffs,cal_errors,thedates]=grace2plmt('CSR','RL05','SD',1);
 %
 %
-%
-% Last modified by charig-at-princeton.edu, 03/16/2016
+% Last modified by mlubeck-at-email.arizona.edu, 03/18/2019
+% Last modified by charig-at-email.arizona.edu, 03/16/2016
 % Last modified by fjsimons-at-alum.mit.edu, 05/17/2011
 
 % Determine parameters and set defaults
@@ -67,14 +67,17 @@ defval('forcenew',1)
 
 % Where the original data files are kept
 defval('ddir1',fullfile(getenv('IFILES'),'GRACE','Originals',Rlevel,Pcenter));
+ 
 
 % Where you would like to save the new .mat file
 defval('ddir2',fullfile(getenv('IFILES'),'GRACE'));
 % And the name of that save file
 if strcmp(units,'SD')
     fnpl=sprintf('%s/%s_%s_alldata_%s.mat',ddir2,Pcenter,Rlevel,units);
-else
+elseif strcmp(units,'POT')
     fnpl=sprintf('%s/%s_%s_alldata.mat',ddir2,Pcenter,Rlevel);
+else
+    error ('The unit input is not valid.')
 end
 
 % If this file already exists, load it.  Otherwise, or if we force it, make
@@ -83,6 +86,12 @@ if exist(fnpl,'file')==2 && forcenew==0
      load(fnpl)
      disp(sprintf('%s loaded by GRACE2PLMT',fnpl))
 else
+    if ~exist(ddir1,'dir')
+       error ('The data you asked for are not currently stored.')
+       %If you received this error it means the directory datanames does
+       %not exist which means you have not downloaded the data or the data
+       %was not downloaded to where the program expects 
+    end
 
 % DATA CENTER
 if strcmp(Pcenter,'GFZ')
@@ -121,8 +130,7 @@ elseif  strcmp(Pcenter,'CSR')
         %in the form rrvv. In this case rr represents the release number
         %maximum 2 digits and vv represents the maximum 2 digit version 
         %number. So for RL06 the nomenclature is 0600 instead of 0006 for
-        %Rl05 previosly. The PID naming convention stays the same. 
-        
+        %Rl05 previosly. The PID naming convention stays the same.    
     end
    % Know a priori what the bandwidth of the coefficients is
    Ldata=60;
@@ -160,8 +168,7 @@ elseif strcmp(Rlevel,'RL05')
     slrc20=load(fullfile(getenv('IFILES'),'SLR','C20_RL05_NH.txt'));
 elseif strcmp(Rlevel,'RL06')
     slrc20=load(fullfile(getenv('IFILES'),'SLR','C20_RL06_NH.txt'));
-    %the RL06 C(2,0) coefficient will be updated once the 
-    %updated data has been released
+   
 end
 % The sigma error is column 4
 slrc20_error=slrc20(:,4)*1e-10;
@@ -180,7 +187,10 @@ if Rlevel=='RL04'
 elseif Rlevel=='RL05'
     deg1=load(fullfile(getenv('IFILES'),'GRACE','deg1_RL05_NH.txt'));
 elseif Rlevel=='RL06'
-    deg1=load(fullfile(getenv('IFILES'),'GRACE','deg1_RL06_NH.txt'));
+    deg1=load(fullfile(getenv('IFILES'),'GRACE','deg1_RL05_NH.txt'));
+     %the RL06 deg 1 will be updated once the updated data has been 
+     %released. For now the file being used is the updated RL05 one
+     %downloaded from the GRACE Tellus website
 end
 [n,m] = size(deg1);
 dates_str = num2str(deg1(:,1));
