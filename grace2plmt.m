@@ -140,10 +140,10 @@ elseif  strcmp(Pcenter,'JPL')
        datanames=ls2cell(fullfile(ddir1,'GSM*JPLEM*0005'));
        % JPL Release Level 5 has no calibrated error files
        %errornames=ls2cell(fullfile(ddir1,'GSM*0060_0004.txt'));
-    elseif strcmp(Rlevel,'RL05');
-        datanames=ls2cell(fullfile(ddir1,'GSM*JPLEM*005'));
     else
         error('JPL RL04 solutions not currently stored');
+    %elseif strcmp(Rlevel,'RL05');
+    %    datanames=ls2cell(fullfile(ddir1,'GSM*JPLEM*005'));
     end
    % Know a priori what the bandwidth of the coefficients is
    Ldata=90;
