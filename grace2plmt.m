@@ -17,7 +17,7 @@ function varargout=grace2plmt(Pcenter,Rlevel,units,forcenew)
 % Pcenter     'CSR' data center at the Center for Space Research
 %             'GFZ' data center at the GeoForschungsZentrum Potsdam
 % Rlevel      The release level of the solution you want.  
-%              Either 'RL04' or 'RL05'
+%              Either 'RL04','RL05', or 'RL06'
 % units       'POT' or 'SD' for whether you want geopotential or surface
 %               mass density
 % forcenew    Whether or not you want to force new generation of a save file
@@ -32,7 +32,11 @@ function varargout=grace2plmt(Pcenter,Rlevel,units,forcenew)
 %    thedates       time stamps in Matlab time
 %
 % NOTE:
-%   The RL05 solutions from CSR do not have any standard deviations 
+
+%	SLR data available from the GRACE Tellus website for RL06:
+%	ftp://podaac-ftp.jpl.nasa.gov/allData/grace/L2/CSR/RL06
+%	 
+%	The RL05 solutions from CSR do not have any standard deviations 
 %    given, formal or calibrated.  These values will be reported as 0.
 %
 %   SLR data available from the GRACE Tellus website:
@@ -51,26 +55,29 @@ function varargout=grace2plmt(Pcenter,Rlevel,units,forcenew)
 % [potcoffs,cal_errors,thedates]=grace2plmt('CSR','RL05','SD',1);
 %
 %
-%
-% Last modified by charig-at-princeton.edu, 03/16/2016
+% Last modified by mlubeck-at-email.arizona.edu, 03/18/2019
+% Last modified by charig-at-email.arizona.edu, 03/16/2016
 % Last modified by fjsimons-at-alum.mit.edu, 05/17/2011
 
 % Determine parameters and set defaults
 defval('Pcenter','CSR')
-defval('Rlevel','RL05')
+defval('Rlevel','RL06')
 defval('units','SD')
 defval('forcenew',1)
 
 % Where the original data files are kept
 defval('ddir1',fullfile(getenv('IFILES'),'GRACE','Originals',Rlevel,Pcenter));
+ 
 
 % Where you would like to save the new .mat file
 defval('ddir2',fullfile(getenv('IFILES'),'GRACE'));
 % And the name of that save file
 if strcmp(units,'SD')
     fnpl=sprintf('%s/%s_%s_alldata_%s.mat',ddir2,Pcenter,Rlevel,units);
-else
+elseif strcmp(units,'POT')
     fnpl=sprintf('%s/%s_%s_alldata.mat',ddir2,Pcenter,Rlevel);
+else
+    error ('The unit input is not valid.')
 end
 
 % If this file already exists, load it.  Otherwise, or if we force it, make
@@ -79,6 +86,12 @@ if exist(fnpl,'file')==2 && forcenew==0
      load(fnpl)
      disp(sprintf('%s loaded by GRACE2PLMT',fnpl))
 else
+    if ~exist(ddir1,'dir')
+       error ('The data you asked for are not currently stored.')
+       %If you received this error it means the directory datanames does
+       %not exist which means you have not downloaded the data or the data
+       %was not downloaded to where the program expects 
+    end
 
 % DATA CENTER
 if strcmp(Pcenter,'GFZ')
@@ -96,13 +109,6 @@ if strcmp(Pcenter,'GFZ')
         errornames=ls2cell(fullfile(ddir1,'GSM*G---_005a.txt'));
         % Know a priori what the bandwidth of the coefficients is
         Ldata=90;
-    elseif strcmp(Rlevelm,'RL06')
-        %find the coefficient file names
-        datanames=ls2cell(fullfile(ddir1,'GSM*G---_006a'));
-        %Find the error files
-        errornames=ls2cell(fullfile(ddir1),'GSM*G---_006a.txt');
-        %Know a priori what the bandwith of the coefficients is
-        Ldata=60;
     end      
 elseif  strcmp(Pcenter,'CSR')
     if strcmp(Rlevel,'RL04')
@@ -113,11 +119,23 @@ elseif  strcmp(Pcenter,'CSR')
        % CSR Release Level 5 has no calibrated error files
        %errornames=ls2cell(fullfile(ddir1,'GSM*0060_0005.txt'));
     elseif strcmp(Rlevel,'RL06')
-        datanames=ls2cell(fullfile(ddir1,'GSM*0060_0006'));
+        datanames=ls2cell(fullfile(ddir1,'GSM*BA01_0600'));
+        %naming convention was changed for RL06 where BA stands
+        %for degree 60 gravity solution and 01 represents unconstrained
+        %spherical harmonic solution with a boxcar windowing function 
+        %(the meaning of 01 was derived from the L-2 UserHandbook_v4.0).
+        %In addition, the BB stands for degree 96 gravity solution with a
+        %boxcar windowing function. 
+        %The other change was made to the last naming entry, which is now
+        %in the form rrvv. In this case rr represents the release number
+        %maximum 2 digits and vv represents the maximum 2 digit version 
+        %number. So for RL06 the nomenclature is 0600 instead of 0006 for
+        %Rl05 previosly. The PID naming convention stays the same.    
     end
    % Know a priori what the bandwidth of the coefficients is
    Ldata=60;
 elseif  strcmp(Pcenter,'JPL')
+    %Do we want to continue JPL support?
     if strcmp(Rlevel,'RL05')
        datanames=ls2cell(fullfile(ddir1,'GSM*JPLEM*0005'));
        % JPL Release Level 5 has no calibrated error files
@@ -150,6 +168,7 @@ elseif strcmp(Rlevel,'RL05')
     slrc20=load(fullfile(getenv('IFILES'),'SLR','C20_RL05_NH.txt'));
 elseif strcmp(Rlevel,'RL06')
     slrc20=load(fullfile(getenv('IFILES'),'SLR','C20_RL06_NH.txt'));
+   
 end
 % The sigma error is column 4
 slrc20_error=slrc20(:,4)*1e-10;
@@ -168,7 +187,10 @@ if Rlevel=='RL04'
 elseif Rlevel=='RL05'
     deg1=load(fullfile(getenv('IFILES'),'GRACE','deg1_RL05_NH.txt'));
 elseif Rlevel=='RL06'
-    deg1=load(fullfile(getenv('IFILES'),'GRACE','deg1_RL06_NH.txt'));
+    deg1=load(fullfile(getenv('IFILES'),'GRACE','deg1_RL05_NH.txt'));
+     %the RL06 deg 1 will be updated once the updated data has been 
+     %released. For now the file being used is the updated RL05 one
+     %downloaded from the GRACE Tellus website
 end
 [n,m] = size(deg1);
 dates_str = num2str(deg1(:,1));
@@ -305,7 +327,8 @@ for index = 1:nmonths
     %%%
     % We have no calibrated errors for CSR release 05, so we have to bypass
     % this section in this case.
-if (strcmp(Pcenter,'CSR') || strcmp(Pcenter,'JPL')) && strcmp(Rlevel,'RL05')
+if (strcmp(Pcenter,'CSR') || strcmp(Pcenter,'JPL')) && (strcmp(Rlevel,'RL05')...
+    || strcmp(Rlevel,'RL06'))
        cal_errors(index,:,:) = [lmcosi_month(:,1:2) zeros(size(lmcosi_month(:,1:2)))];
     else
     fname2=fullfile(ddir1,errornames{index});
