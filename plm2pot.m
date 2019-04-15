@@ -71,7 +71,10 @@ if ~isstr(lmcosi)
   % Perhaps worth updating these for a more realistic, but
   % still radial, mantle viscosity?
   % Interpolate the elastic Love numbers to the bandwidth you need
-  [lkli,lkl]=lovenums('Wahr',el);
+  if wat == 4 || wat == 5
+      [lkli,lkl]=lovenums('Wahr',el);
+  end
+  
     
   switch wat
    case 0 % Geoid (anomaly) (undulation)
@@ -127,7 +130,9 @@ if ~isstr(lmcosi)
   elseif lmcosi(1)==1 && lmcosi(1,2)==0
     lmcosi=[0 0 GMr 0 repmat(0,1,size(lmcosi,2)-4); % Degree 0
 	    lmcosi]; % Then the rest
-    fact = [1 1; fact];
+    if ~wat == 0
+        fact = [1 1; fact];
+    end
   end
 
   switch wit
@@ -159,8 +164,8 @@ elseif strcmp(lmcosi,'demo1')
   cb=colorbar('hor');
   shrink(cb,1.5,2)
   movev(cb,-0.05)
-  axes(cb)
-  set(get(cb,'xlabel'),'string','Surface density [kg/m^2]');
+  %axes(cb)
+  %set(get(cb,'xlabel'),'string','Surface density [kg/m^2]');
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   axes(ah(2))
   % Plot in mm
@@ -172,8 +177,8 @@ elseif strcmp(lmcosi,'demo1')
   cb=colorbar('hor');
   shrink(cb,1.5,2)
   movev(cb,-0.05)
-  axes(cb)
-  set(get(cb,'xlabel'),'string','Geoid height variation [milimeters]');
+  %axes(cb)
+  %set(get(cb,'xlabel'),'string','Geoid height variation [milimeters]');
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   axes(ah(3))
   [data,ch,ph]=plotplm(lmcosiSD,[],[],4,1);
@@ -183,7 +188,7 @@ elseif strcmp(lmcosi,'demo1')
   cb=colorbar('hor');
   shrink(cb,1.5,2)
   movev(cb,-0.05)
-  axes(cb)
-  set(get(cb,'xlabel'),'string','Surface density [kg/m^2]');
+  %axes(cb)
+  %set(get(cb,'xlabel'),'string','Surface density [kg/m^2]');
 end
 

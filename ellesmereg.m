@@ -81,7 +81,7 @@ if ~isstr(res) % Not a demo
       else
           % We make a new buffer
           disp('Buffering the coastlines... this may take a while');
-          XY=ellesmere(10);
+          XY=ellesmereg(10);
           if buf > 0
              inout='out';
           else
@@ -91,7 +91,7 @@ if ~isstr(res) % Not a demo
           %%%
           % First we make the thing next door (Greenland)
           %%%
-          XY1 = ellesmere(10);
+          XY1 = ellesmereg(10);
           if buf>0.7
             XY1 = ellesmere(10,buf-0.5);
             LonB=XY1(:,1); LatB=XY1(:,2);
