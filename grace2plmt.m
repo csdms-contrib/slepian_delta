@@ -55,7 +55,7 @@ function varargout=grace2plmt(Pcenter,Rlevel,units,forcenew)
 % [potcoffs,cal_errors,thedates]=grace2plmt('CSR','RL05','SD',1);
 %
 %
-% Last modified by mlubeck-at-email.arizona.edu, 03/18/2019
+% Last modified by mlubeck-at-email.arizona.edu, 09/12/2019
 % Last modified by charig-at-email.arizona.edu, 03/16/2016
 % Last modified by fjsimons-at-alum.mit.edu, 05/17/2011
 
@@ -187,10 +187,8 @@ if Rlevel=='RL04'
 elseif Rlevel=='RL05'
     deg1=load(fullfile(getenv('IFILES'),'GRACE','deg1_RL05_NH.txt'));
 elseif Rlevel=='RL06'
-    deg1=load(fullfile(getenv('IFILES'),'GRACE','deg1_RL05_NH.txt'));
-     %the RL06 deg 1 will be updated once the updated data has been 
-     %released. For now the file being used is the updated RL05 one
-     %downloaded from the GRACE Tellus website
+    deg1=load(fullfile(getenv('IFILES'),'GRACE','deg1_RL06_NH.txt'));
+     
 end
 [n,m] = size(deg1);
 dates_str = num2str(deg1(:,1));

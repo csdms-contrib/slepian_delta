@@ -19,6 +19,8 @@ function varargout=grace2slept(Dataproduct,TH,XY_buffer,Lwindow,phi,theta,omega,
 %                  at the Center for Space Research
 %               'CSRRL05' Release level 05 data from the data center 
 %                  at the Center for Space Research
+%               'CSRRL06' Release level 06 data from the data center at the
+%                   center for Space Research
 %               'GFZRL04' Release level 04 data from the data center
 %                  at the GeoForschungsZentrum Potsdam
 %               'GFZRL05' Release level 05 data from the data center
@@ -64,11 +66,12 @@ function varargout=grace2slept(Dataproduct,TH,XY_buffer,Lwindow,phi,theta,omega,
 %
 % SEE ALSO: PLM2SLEP
 %
+% Last modified by mlubeck-at-email.arizona.edu, 09/12/2019
 % Last modified by charig-at-princeton.edu, 03/16/2016
 % Last modified by fjsimons-at-alum.mit.edu, 06/26/2012
 
 % Determine parameters and set defaults
-defval('Dataproduct','CSRRL05')
+defval('Dataproduct','CSRRL06')
 defval('TH','greenland')
 defval('Lwindow',18)
 defval('phi',0)
