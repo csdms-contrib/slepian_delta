@@ -234,7 +234,7 @@ else % Just do the plms
             pause
         end
     end
-    
+    total=0;
 end % end if exist
 
 
