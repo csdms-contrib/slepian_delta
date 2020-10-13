@@ -6,3 +6,5 @@ which you may cite if you find any of these routines useful!
 
 ## Latest release
 [![DOI](https://zenodo.org/badge/6548/csdms-contrib/slepian_delta.svg)](https://zenodo.org/badge/latestdoi/6548/csdms-contrib/slepian_delta)
+
+[![View slepian_delta on File Exchange](https://www.mathworks.com/matlabcentral/images/matlab-file-exchange.svg)](https://www.mathworks.com/matlabcentral/fileexchange/81106-slepian_delta)
