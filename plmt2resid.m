@@ -45,9 +45,8 @@ function varargout=plmt2resid(plmt,thedates,fitwhat,givenerrors)
 % Last modified by charig-at-princeton.edu 5/24/2011
 % Last modified by fjsimons-at-alum.mit.edu 5/26/2011
 
-defval('xver',0)  
-defval('plmt',fullfile(getenv('IFILES'),'GRACE','CSR_alldata.mat'))
-defval('plmt',fullfile(getenv('IFILES'),'GRACE','GFZ_alldata.mat'))
+defval('xver',0)
+defval('plmt',fullfile(getenv('IFILES'),'GRACE','CSR_RL05_alldata.mat'))
 warning('off','MATLAB:divideByZero');
 
 if isstr(plmt)
