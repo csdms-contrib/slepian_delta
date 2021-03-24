@@ -61,18 +61,61 @@ else
 end
 
 
-
+% Get the file date information
 d1 = dir(fnpl1);
 d2 = dir(fnpl2);
 
 % If this file already exists, and it is more new than the source file, 
 % then load it.  Otherwise make a new one and return that one. This should
 % automatically make and use a new .mat file if you update the source file.
-if ~exist(fnpl2,'file')==2 || datenum(d1.date) > datenum(d2.date)
+if ~(exist(fnpl2,'file')==2) || datenum(d1.date) > datenum(d2.date)
      % Here create a new save file to use.
      % This is reversed from our typical if, exist, load convention because
      % this way if the file does not exist it will skip the second if
      % condition (which would error on the datenum call) and go straight here
+     
+     
+     
+     fid = fopen(fnpl1);
+     tline = fgetl(fid);
+     
+     % Keep reading lines until we get to the 'end of header' line
+     while isempty(tline) || ~strcmp(tline(1:5),'end o')
+         tline = fgetl(fid);
+     end
+     
+     % Now do a formatted text scan on the data
+     C = textscan(fid,'%s%d%d%f%f%f%f%s%s%s');
+     fclose(fid);
+             
+     % What we actually want is a 3 dimensional cell array with the date as
+     % the first dimension and a lmcosi as dimension 2 and 3 (just like
+     % grace2plmt)
+
+     % Use the epoch start and end dates to get the midpoint date 
+     thedates = (datenum(C{8},'yyyymmdd') + datenum(C{9},'yyyymmdd'))./2;
+     [b,m] = unique(thedates);
+     thedates = thedates(m);
+
+     % Old formula
+     % for i=1:n/2; temp = [deg1(2*i-1,2:7); deg1(2*i,2:7)]; mydeg1(i,:,:) = temp; end;
+     
+    % Open and scan the file (data from all three centers is 10 columns)
+    %fid = fopen(fnpl1);
+    %C = textscan(fid,'%s%s%s%s%s%s%s%s%s%s');
+
+
+    %keyboard
+    % Only grab the lines for GRCOF2
+    Carray = cat(3,C{:});
+    I = strmatch('GRCOF2',Carray(:,1,1),'exact');
+    Carray = squeeze(Carray(I,1,:));
+    
+    % Only want columns 2-7, and as format double
+    Carray = Carray(:,2:7);
+    lmcosi_month=cellfun(@str2num,Carray);
+    % This should be addmup(Ldata)
+    [m,n] = size(lmcosi_month);
      
      
      
