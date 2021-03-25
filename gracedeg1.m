@@ -96,6 +96,15 @@ if ~(exist(fnpl2,'file')==2) || datenum(d1.date) > datenum(d2.date)
      thedates = (datenum(C{8},'yyyymmdd') + datenum(C{9},'yyyymmdd'))./2;
      [b,m] = unique(thedates);
      thedates = thedates(m);
+     
+     keyboard
+     deg1data = [double(C{2}) double(C{3}) C{4} C{5}];
+     
+     for i=1:(length(C{1}))/2
+         temp = [deg1data(2*i-1,:); 
+                 deg1data(2*i,:)]; 
+         mydeg1(i,:,:) = temp; 
+     end
 
      % Old formula
      % for i=1:n/2; temp = [deg1(2*i-1,2:7); deg1(2*i,2:7)]; mydeg1(i,:,:) = temp; end;
@@ -105,7 +114,7 @@ if ~(exist(fnpl2,'file')==2) || datenum(d1.date) > datenum(d2.date)
     %C = textscan(fid,'%s%s%s%s%s%s%s%s%s%s');
 
 
-    %keyboard
+    keyboard
     % Only grab the lines for GRCOF2
     Carray = cat(3,C{:});
     I = strmatch('GRCOF2',Carray(:,1,1),'exact');
