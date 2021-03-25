@@ -15,9 +15,9 @@ function varargout=gracedeg1(Pcenter,Rlevel)
 % OUTPUT:
 % 
 % Returns these variables and saves them in a .mat file:
-%    potcoffs       potential coefficients [nmonths x addmup(Ldata) x 4]
-%                    these could also be in surface mass density
 %    thedates       time stamps in Matlab time
+%    deg1data       potential coefficients for just degree l = 1
+%                      [nmonths x 2 x 4]
 %
 % NOTE:
 %
@@ -32,7 +32,7 @@ function varargout=gracedeg1(Pcenter,Rlevel)
 %   the TN-13 document is newer, then we use it to create a new .mat file
 %   and then load the .mat file.
 %
-% Last modified by charig-at-email.arizona.edu, 03/19/2021
+% Last modified by charig-at-email.arizona.edu, 03/24/2021
 
 % Determine parameters and set defaults
 defval('Pcenter','CSR')
@@ -97,51 +97,32 @@ if ~(exist(fnpl2,'file')==2) || datenum(d1.date) > datenum(d2.date)
      [b,m] = unique(thedates);
      thedates = thedates(m);
      
-     keyboard
+     % Re cast the ints as doubles to get it all in one matrix
      deg1data = [double(C{2}) double(C{3}) C{4} C{5}];
      
+     % Now reorder into a lmcosi format for each month
      for i=1:(length(C{1}))/2
          temp = [deg1data(2*i-1,:); 
                  deg1data(2*i,:)]; 
-         mydeg1(i,:,:) = temp; 
+         deg1lmcosi(i,:,:) = temp; 
      end
 
-     % Old formula
-     % for i=1:n/2; temp = [deg1(2*i-1,2:7); deg1(2*i,2:7)]; mydeg1(i,:,:) = temp; end;
+     deg1data = deg1lmcosi;
      
-    % Open and scan the file (data from all three centers is 10 columns)
-    %fid = fopen(fnpl1);
-    %C = textscan(fid,'%s%s%s%s%s%s%s%s%s%s');
-
-
-    keyboard
-    % Only grab the lines for GRCOF2
-    Carray = cat(3,C{:});
-    I = strmatch('GRCOF2',Carray(:,1,1),'exact');
-    Carray = squeeze(Carray(I,1,:));
-    
-    % Only want columns 2-7, and as format double
-    Carray = Carray(:,2:7);
-    lmcosi_month=cellfun(@str2num,Carray);
-    % This should be addmup(Ldata)
-    [m,n] = size(lmcosi_month);
-     
-     
+     % Create a save file
+     save(fnpl2,'thedates','deg1data')
      
 else
-     load(fnpl)
-     disp(sprintf('%s loaded by GRACEDEG1',fnpl))
+     load(fnpl2)
+     disp(sprintf('%s loaded by GRACEDEG1',fnpl2))
 end
 
 
 
 
 
-
-
-
 % Collect output
-varns={};
+varns={thedates,deg1data};
 varargout=varns(1:nargout);
 
 
