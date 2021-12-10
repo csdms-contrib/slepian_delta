@@ -1,10 +1,9 @@
 function varargout=readgldas(version,resolution,timeres,forcing,varlist,forcenew)
 % [datanames,varlist,thedates,thevars]=READGLDAS(version,resolution,timeres,forcing,varlist,forcenew)
 %
-% This program reads in the GLDAS products from NASA GSFC which should 
-% be netcdf format, and saves them as matlab mat files.  It functions like
-% a version of NET2MAT specific for GLDAS products.
-%
+% This program reads in the GLDAS products from NASA GSFC which should be
+% netcdf format, and saves them as MATLAB mat files. It functions like a
+% version of NET2MAT specific for GLDAS products.
 %
 % INPUT:
 % 
@@ -46,7 +45,6 @@ function varargout=readgldas(version,resolution,timeres,forcing,varlist,forcenew
 %   Default behaviour is to save the variable mat files in the same
 %   directory as the netcdf files themselves.
 %
-%
 % EXAMPLE: 
 %
 % See also: NETVARREAD, NET2MAT, NCREAD
@@ -66,7 +64,7 @@ if resolution==0.25
 elseif resolution==1
     resolution = '10';
 else
-    error('There was a problem with the spatial reolution you requested.')
+    error('There was a problem with the spatial resolution you requested.')
 end
 
 % Form a directory out of the model we want
