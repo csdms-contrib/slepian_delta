@@ -3,7 +3,7 @@ function varargout=Clmlmp2Crrp(Clmlmp,rnot,degres,VARoption)
 % [r,lon,lat]=CLMLMP2CRRP(Clmlmp,[],degres,VARoption)
 %
 % Takes a spherical harmonic covariance matrix and calculates the
-% spatial covariance. (map = Yrplm*Clmlmp*Yrlm')  
+% spatial covariance (map = Yrplm*Clmlmp*Yrlm')  
 % OR in the case of an empty 'rnot', makes a field of spatial variance
 %
 % INPUT:
@@ -11,7 +11,7 @@ function varargout=Clmlmp2Crrp(Clmlmp,rnot,degres,VARoption)
 % Clmlmp    Spherical harmonic covariance matrix, assumed to be ordered as
 %             in GLMALPHA (not KERNELC)
 % rnot      The point(s) with which we want to find spatial covariance.
-%             - If rnot is empty(i.e. []) then do whole sphere variance [default]
+%             - If rnot is empty (i.e. []) then do whole sphere variance [default]
 %             - Otherwise, rnot is a n-by-2 matrix of 
 %               [lon colat; lon2 colat2; etc]
 % degres    The degree resolution you want. [default: Nyquist]
@@ -204,7 +204,6 @@ if ~isstr(Clmlmp)
         difer(r-diag(Covrr))
       end
       
-      
     elseif VARoption == 3
       % Option 3: Loop over each spatial point and calculate
       % Y(r)*Clmlmp*Y(r') for each point in one go.  This is
@@ -229,11 +228,7 @@ if ~isstr(Clmlmp)
     % Collect output
     varns={r,phi,theta};
     varargout=varns(1:nargout);
-      
-      
   end % end covariance at points or global variance?
-
-    
 elseif strcmp(Clmlmp,'demo1')
   % Test the efficiency and accuracy of the three methods
   L=30;
@@ -255,8 +250,6 @@ elseif strcmp(Clmlmp,'demo1')
   difer(r1-r2)
   disp('Check 1 vs. 3')
   difer(r1-r3)
-  
-  
 elseif strcmp(Clmlmp,'demo2')
   % Lets make a figure of the global variance
   L=60;
@@ -289,7 +282,6 @@ elseif strcmp(Clmlmp,'demo2')
   colorbar
   longticks(gca,2)
   t=title('Standard deviation of noise (mm water equivalent)');
-  
 elseif strcmp(Clmlmp,'demo3')
   % Lets make a figure of the error centered over Greenland, expressed 
   % in mm of water equivalent
@@ -304,7 +296,6 @@ elseif strcmp(Clmlmp,'demo3')
   colorbar
   longticks(gca,2)
   t=title('Spatial Variance of noise');
-  
 elseif strcmp(Clmlmp,'demo4')
   % Lets make a figure of the covariance of one point 
   % centered over Greenland
@@ -342,7 +333,4 @@ elseif strcmp(Clmlmp,'demo5')
   colorbar
   longticks(gca,2)
   t=title('Spatial Covariance of noise');
-
 end % end if isstr
-
-    
