@@ -44,7 +44,6 @@ end
 
 N={'Earth','Moon','Mars'};
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 clf
 [ah,ha]=krijetem(subnum(length(P),2));
 
