@@ -22,7 +22,7 @@ function varargout=periodfit(yofx,perdx,x,comp)
 % perdb   The best-fitting period from the set
 % perdx   The target period if you didn't remember it
 %
-% Last modified by fjsimons-at-alum.mit.edu, 2/17/2012
+% Last modified by fjsimons-at-alum.mit.edu, 12/10/2021
 
 defval('comp','series')
 
