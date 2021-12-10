@@ -41,10 +41,10 @@ function lmcosi=plm2pot(lmcosi,r,GM,a,wat,wit)
 % geoid, then convert back, making a plot of all 3.  Panel 1 and 3 should
 % be the same.  Panel 2 should be more smoothed.
 %
+% Last modified by fjsimons-at-alum.mit.edu, 12/10/2021
 % Last modified by kengourley-at-email.arizona.edu, 08/29/2018
 % Last modified by charig-at-princeton.edu, 05/14/2015
 % Last modified by kwlewis-at-princeton.edu, 02/23/2012
-% Last modified by fjsimons-at-alum.mit.edu, 05/24/2013
 
 % Should write something that involves the geoid kernels and compares the
 % dynamic ones with the load-Love ones. 
@@ -62,9 +62,9 @@ if ~isstr(lmcosi)
   
   % Note this is always in here, don't confuse when using PLM2XYZ
   GMr=GM/r;
-  
-  % Blakely Eq (7.2)
+  % The degrees
   el=lmcosi(:,1);
+  % Blakely Eq (7.2)
   arl=(a/r).^el;
   
   % Published elastic Love numbers from Wahr et al. (1998).  
@@ -74,7 +74,6 @@ if ~isstr(lmcosi)
   if wat == 4 || wat == 5
       [lkli,lkl]=lovenums('Wahr',el);
   end
-  
     
   switch wat
    case 0 % Geoid (anomaly) (undulation)
@@ -124,15 +123,11 @@ if ~isstr(lmcosi)
 	    1 1 0 0 repmat(0,1,size(lmcosi,2)-4); % Degree 1 order 1
 	    lmcosi]; % Then the rest
     % Preserve dimension of scaling factor when calculating geoid
-    if ~isscalar(fact)
-        fact = [1 1; 1 1; 1 1; fact];
-    end
+    fact=[repmat(1,3,size(lmcosi,2)-4); fact];
   elseif lmcosi(1)==1 && lmcosi(1,2)==0
     lmcosi=[0 0 GMr 0 repmat(0,1,size(lmcosi,2)-4); % Degree 0
 	    lmcosi]; % Then the rest
-    if ~wat == 0
-        fact = [1 1; fact];
-    end
+    fact=[repmat(1,1,size(lmcosi,2)-4); fact];
   end
 
   switch wit
@@ -164,8 +159,8 @@ elseif strcmp(lmcosi,'demo1')
   cb=colorbar('hor');
   shrink(cb,1.5,2)
   movev(cb,-0.05)
-  %axes(cb)
-  %set(get(cb,'xlabel'),'string','Surface density [kg/m^2]');
+  axes(cb)
+  set(get(cb,'xlabel'),'string','Surface density [kg/m^2]');
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   axes(ah(2))
   % Plot in mm
@@ -177,8 +172,8 @@ elseif strcmp(lmcosi,'demo1')
   cb=colorbar('hor');
   shrink(cb,1.5,2)
   movev(cb,-0.05)
-  %axes(cb)
-  %set(get(cb,'xlabel'),'string','Geoid height variation [milimeters]');
+  axes(cb)
+  set(get(cb,'xlabel'),'string','Geoid height variation [milimeters]');
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   axes(ah(3))
   [data,ch,ph]=plotplm(lmcosiSD,[],[],4,1);
@@ -188,7 +183,7 @@ elseif strcmp(lmcosi,'demo1')
   cb=colorbar('hor');
   shrink(cb,1.5,2)
   movev(cb,-0.05)
-  %axes(cb)
-  %set(get(cb,'xlabel'),'string','Surface density [kg/m^2]');
+  axes(cb)
+  set(get(cb,'xlabel'),'string','Surface density [kg/m^2]');
 end
 
