@@ -1,12 +1,12 @@
 function varargout=plm2avgp(lmcosi,dom) 
 % [Int,A,miniK,XY]=PLM2AVGP(lmcosi,dom)
 %
-% A parallel version of plm2avg, for when you are running it many many times.
+% A parallel version of PLM2AVG, for when you are running it many many times.
 %
 % Computes the integral and average value of a spherical harmonic 
-% function (lmcosi) within a 
-% specific area (dom).  This is done by creating an integration vector and 
-% multiplying by the unwrapped coefficients of the field (from lmcosi).
+% function (lmcosi) within a specific area (dom).  This is done by
+% creating an integration vector and multiplying by the unwrapped 
+% coefficients of the field (from lmcosi).
 %
 % INPUT:
 %
@@ -116,7 +116,7 @@ parfor lm1dex=1:dimK
       I(:,lm1dex)=sincos(acos(x),m1,0,phint);
    end
 end
-% coscos was reused here even though one of the m values is 0 because it is
+% COSCOS was reused here even though one of the m values is 0 because it is
 % useful for doing odd geographics in matrix form (i.e. if the continent
 % looks like a circle with hole in it)
 
@@ -128,19 +128,19 @@ miniK = w(:)'*(Xlm(:,bigo).*I);
 miniK=miniK/4/pi;
 
 % Compare with KERNELC
-%if xver==1
-  %KK=rindeks(kernelc(Lmax,dom),1);
-%end
+defval('xver',0)
+if xver==1
+  KK=rindeks(kernelc(Lmax,dom),1);
+  % This then makes miniK(1) the fractional area on the sphere
+  % Check by comparing to output from spharea, if you want
+  % Note: SPHAREA defaults to 17 abcissas and weights, while this code uses 101.
+  % So differences to be expected when continents are squiggly.
+  % Check the first term which should equal the area on the unit sphere
+  A1=spharea(XY); A2=areaint(XY(:,2),XY(:,1));
+  disp(sprintf('Area check...  PLM2AVG A: %6.7f ; SPHAREA A: %6.7f ; AREAINT A: %6.7f',...
+	       miniK(1),A1,A2))
+end
      
-% This then makes miniK(1) the fractional area on the sphere
-% Check by comparing to output from spharea, if you want
-% Note: SPHAREA defaults to 17 abcissas and weights, while this code uses 101.
-% So differences to be expected when continents are squiggly.
-% Check the first term which should equal the area on the unit sphere
-%A1=spharea(XY); A2=areaint(XY(:,2),XY(:,1));
-%disp(sprintf('Area check...  PLM2AVG A: %6.7f ; SPHAREA A: %6.7f ; AREAINT A: %6.7f',...
-%	miniK(1),A1,A2))
-
 % Now take the vector miniK and multiply with the vector for the function
 % you want (lmcosi) and you will get the integral of that field within the
 % region of interest
@@ -216,5 +216,4 @@ elseif strcmp(lmcosi,'demo2')
   disp('Avg value check... PLM2AVG should equal the Fib Grid for good resolution');
   disp(sprintf('PLM2AVG Avg: %6.7f ; FIB GRID Avg: %6.7f ; ERROR: %6.2f%%',...
       A,AF,(A-AF)/A*100))
-
 end
