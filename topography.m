@@ -55,6 +55,3 @@ fig2print(gcf,'landscape')
 id
 figdisp
 disp('Use option -painters')
-
-
- 
