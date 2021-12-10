@@ -38,6 +38,8 @@ function h = hash(inp,meth)
 %     disp([algs{n} ' (' num2str(length(h)*4) ' bits):'])
 %     disp(h)
 % end
+%
+% Written by Michael Kleder
 
 inp=inp(:);
 % convert strings and logicals into uint8 format
