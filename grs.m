@@ -1,14 +1,9 @@
 function varargout=grs(GM,rf,a,omega,nzo) 
-%========================= SYNTAX =================================
+% [barC2n,geqt,gpol,U0,m,ecc,eccp,b,E,c]=GRS(GM,rf,a,omega,nzo) 
 %
-% [barC2n,geqt,gpol,U0,m,ecc,eccp,b,E,c]=
-%                         grs(GM,rf,a,omega,nzo) 
-%
-%========================= PURPOSE ================================
-% 
 % Calculate geopotential constants in a reference earth model.
 %
-%========================= INPUTS =================================
+% INPUT:
 %
 % GM         Gravitational constant times mass reference   [scalar]
 % rf         Inverse flattening (1/f)                      [scalar]
@@ -16,7 +11,7 @@ function varargout=grs(GM,rf,a,omega,nzo)
 % omega      Angular velocity                              [scalar]
 % nzo        Number of zonal harmonics (2,4,... 2*nzo)     [scalar]
 %
-%========================= OUTPUTS ================================
+% OUTPUT:
 %
 % barC2n     Normalized even zonal harmonics of            [matrix]
 %            the corresponding Somigliana-Pizzetti normal field.          
@@ -32,9 +27,9 @@ function varargout=grs(GM,rf,a,omega,nzo)
 % E          Linear eccentricity                           [scalar]
 % c          Polar radius of curvature                     [scalar]
 %
-%========================= EXAMPLES ===============================
+% EXAMPLES:
 %
-% [1] For the WGS84:
+% [1] For WGS84:
 %       GM=0.3986004418e15;
 %       a=6378137;
 %       omega=7292115e-11;
@@ -42,20 +37,20 @@ function varargout=grs(GM,rf,a,omega,nzo)
 %       [barC2n,geqt,gpol,U0,m,ecc,eccp,b,E,c]=grs(GM,rf,a,omega) 
 % Compare the output to page in ref. [2].
 %       
-%========================= NOTES ==================================
+% NOTES: 
 %
 % [1] All the following page numbers and equation numbers refer to the
 %       book 'Physical Geodesy' by Hofmann-wellenhof and Moritz + 2006
 %
-%========================= REFERENCES =============================
+% REFERENCES
 %
 % [1] Moritz (1984)
 % [2] Hofmann-Wellenhof and Moritz (2006)
 % [3] Heiskanen and Moritz (1964)
 % [4] EGM2008: hsynth_WGS84.f
 % 
-%====== Last modified by dongwang-at-princeton.edu, 09/02/2009 ====
-% Last modified by fjsimons-at-alum.mit.edu, 02/22/2012
+% Last modified by fjsimons-at-alum.mit.edu, 10/12/2021
+% Last modified by dongwang-at-princeton.edu, 09/02/2009
 
 % INPUT and OUTPUT error check.
 error(nargchk(0,5,nargin,'struct'));
