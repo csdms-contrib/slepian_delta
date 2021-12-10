@@ -1,7 +1,7 @@
 function varargout=geopotential(wat)
 % data=GEOPOTENTIAL(wat)
 %
-% Illustrates Earth, Moon, Mars gravity
+% Illustrates Earth, Moon, Mars gravity fields
 %
 % INPUT:
 %
@@ -18,7 +18,7 @@ function varargout=geopotential(wat)
 %
 % FRS149_1, FRS149_3, PLM2POT, EGM96_X
 %
-% Last modified by fjsimons-at-alum.mit.edu, 06/19/2008
+% Last modified by fjsimons-at-alum.mit.edu, 12/10/2021
 
 defval('wat',2)
 
