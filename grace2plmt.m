@@ -6,8 +6,8 @@ function varargout=grace2plmt(Pcenter,Rlevel,units,forcenew)
 % in a .mat file.  In particular, the coefficients are reordered to our
 % prefered lmcosi format, they are referenced to the WGS84 ellipsoid, 
 % the C2,0 coefficients are replaced with more accurate measurements from
-% satellite laser ranging, and the degree one coefficients are 
-% substituted with those from Swenson et al. (2008).  You have the option 
+% satellite laser ranging from Loomis et al, (2020), and the degree one coefficients are 
+% substituted with those from Sun et al., (2016).  You have the option 
 % of leaving them as geopotential 
 % or converting them to surface mass density using the method of 
 % Wahr et al. 1998, based on Love numbers (see PLM2POT).
@@ -26,38 +26,39 @@ function varargout=grace2plmt(Pcenter,Rlevel,units,forcenew)
 % OUTPUT:
 % 
 % Returns these variables and saves them in a .mat file:
-%    potcoffs       potential coefficients [nmonths x addmup(Ldata) x 6]
+%    potcoffs       potential coefficients [nmonths x addmup(Ldata) x 4]
 %                    these could also be in surface mass density
-%    cal_errors     calibrated errors [nmonths x addmup(Ldata) x 4]
 %    thedates       time stamps in Matlab time
 %
 % NOTE:
-
-%	SLR data available from the GRACE Tellus website for RL06:
-%	ftp://podaac-ftp.jpl.nasa.gov/allData/grace/L2/CSR/RL06
+%
+%   2/19/2021 Formal or calibrated uncertainties have not been reported 
+%    since RL04 so we will discontinue the output of these. The output
+%    variables will be altered so existing scripts will need to be adjusted
+%    to take this into account. A corresponding change has been made in
+%    GRACE2SLEPT
+%
+%	GRACE data available from NASA PODAAC:
+%	https://podaac.jpl.nasa.gov/
 %	 
-%	The RL05 solutions from CSR do not have any standard deviations 
-%    given, formal or calibrated.  These values will be reported as 0.
+%   See gracedeg1.m and gracedeg2.m to see how we update the spherical
+%   harmonic degree 1, degree 2, and degree 3 (when available)
+%   coefficients. These are usually read from the Technical Notes documents
+%   distributed alongside GRACE data.
+%      
 %
-%   SLR data available from the GRACE Tellus website:
-%   http://grace.jpl.nasa.gov/data/J2/ notably 
-%   ftp://ftp.csr.utexas.edu/pub/slr/degree_2/C20_RL04_2010_12.txt
-%  The header was removed and the file renamed for easy use.
-%  Updated files keep getting posted in the same location.  
-%
-%  SLR data available from the GRACE Tellus website:
-%   http://grace.jpl.nasa.gov/data/degree1/ notably 
-%   ftp://podaac.jpl.nasa.gov/allData/tellus/L2/degree_1/
-%  The header was removed and the file renamed for easy use.
-%  Updated files keep getting posted in the same location.  
 %
 % EXAMPLE: to make a new save file when you have added more months
-% [potcoffs,cal_errors,thedates]=grace2plmt('CSR','RL05','SD',1);
+% [potcoffs,thedates]=grace2plmt('CSR','RL06','SD',1);
 %
-%
+% Last modified by charig-at-email.arizona.edu, 2/2/2022
+% Last modified by lashokkumar-at-arizona.edu, 11/09/2020
 % Last modified by mlubeck-at-email.arizona.edu, 03/18/2019
-% Last modified by charig-at-email.arizona.edu, 03/16/2016
 % Last modified by fjsimons-at-alum.mit.edu, 05/17/2011
+
+
+
+
 
 % Determine parameters and set defaults
 defval('Pcenter','CSR')
@@ -68,7 +69,6 @@ defval('forcenew',1)
 % Where the original data files are kept
 defval('ddir1',fullfile(getenv('IFILES'),'GRACE','Originals',Rlevel,Pcenter));
  
-
 % Where you would like to save the new .mat file
 defval('ddir2',fullfile(getenv('IFILES'),'GRACE'));
 % And the name of that save file
@@ -88,9 +88,9 @@ if exist(fnpl,'file')==2 && forcenew==0
 else
     if ~exist(ddir1,'dir')
        error ('The data you asked for are not currently stored.')
-       %If you received this error it means the directory datanames does
-       %not exist which means you have not downloaded the data or the data
-       %was not downloaded to where the program expects 
+       % If you received this error it means the directory datanames does
+       % not exist which means you have not downloaded the data, or the data
+       % does not exist where the function expects.
     end
 
 % DATA CENTER
@@ -116,24 +116,22 @@ elseif  strcmp(Pcenter,'CSR')
        errornames=ls2cell(fullfile(ddir1,'GSM*0060_0004.txt'));
     elseif strcmp(Rlevel,'RL05')
        datanames=ls2cell(fullfile(ddir1,'GSM*0060_0005'));
-       % CSR Release Level 5 has no calibrated error files
-       %errornames=ls2cell(fullfile(ddir1,'GSM*0060_0005.txt'));
     elseif strcmp(Rlevel,'RL06')
-        datanames=ls2cell(fullfile(ddir1,'GSM*BA01_0600'));
-        %naming convention was changed for RL06 where BA stands
-        %for degree 60 gravity solution and 01 represents unconstrained
-        %spherical harmonic solution with a boxcar windowing function 
-        %(the meaning of 01 was derived from the L-2 UserHandbook_v4.0).
-        %In addition, the BB stands for degree 96 gravity solution with a
-        %boxcar windowing function. 
-        %The other change was made to the last naming entry, which is now
-        %in the form rrvv. In this case rr represents the release number
-        %maximum 2 digits and vv represents the maximum 2 digit version 
-        %number. So for RL06 the nomenclature is 0600 instead of 0006 for
-        %Rl05 previosly. The PID naming convention stays the same.    
+       datanames=ls2cell(fullfile(ddir1,'GSM*BA01_0600'));
+       % Naming convention was changed for RL06 where BA stands
+       % for degree 60 gravity solution and 01 represents unconstrained
+       % spherical harmonic solution with a boxcar windowing function 
+       % (see L-2 UserHandbook_v4.0).
+       % In addition, the BB stands for degree 96 gravity solution with a
+       % boxcar windowing function. 
+       % The other change was made to the last naming entry, which is now
+       % in the form rrvv. In this case rr represents the release number
+       % maximum 2 digits and vv represents the maximum 2 digit version 
+       % number. So for RL06 the nomenclature is 0600 instead of 0006 for
+       % Rl05 previosly. The PID naming convention stays the same.    
     end
-   % Know a priori what the bandwidth of the coefficients is
-   Ldata=60;
+    % Know a priori what the bandwidth of the coefficients is
+    Ldata=60;
 elseif  strcmp(Pcenter,'JPL')
     %Do we want to continue JPL support?
     if strcmp(Rlevel,'RL05')
@@ -159,45 +157,58 @@ a=fralmanac('a_EGM96','Earth');
 
 % C20 CORRECTION SETUP
 
-% Load the C(2,0) coefficients from satellite laser ranging, depending on
-% our release level. Note, here the 'NH' part describes a no header version
-% of the SLR datafiles.
-if strcmp(Rlevel,'RL04')
-    slrc20=load(fullfile(getenv('IFILES'),'SLR','C20_RL04_NH.txt'));
-elseif strcmp(Rlevel,'RL05')
-    slrc20=load(fullfile(getenv('IFILES'),'SLR','C20_RL05_NH.txt'));
-elseif strcmp(Rlevel,'RL06')
-    slrc20=load(fullfile(getenv('IFILES'),'SLR','C20_RL06_NH.txt'));
-   
-end
-% The sigma error is column 4
-slrc20_error=slrc20(:,4)*1e-10;
-% Remove the AOD1B model which was removed from the GRACE GSM data but
-% restored to this SLR data.  Use the raw value (column 2). See data headers.
-slrc20=[slrc20(:,1) slrc20(:,2)-slrc20(:,5)*1e-10];
-% Convert the dates to Matlab format
-[n,m]=size(slrc20);
-slrc20(:,1)=datenum([slrc20(:,1) ones(n,1) ones(n,1)]);
-% Make slrc20 relative to the WGS84 ellipsoid
+% % Load the C(2,0) coefficients from satellite laser ranging, depending on
+% % our release level. Note, here the 'NH' part describes a no header version
+% % of the SLR datafiles.
+% if strcmp(Rlevel,'RL04')
+%     slrc20=load(fullfile(getenv('IFILES'),'SLR','C20_RL04_NH.txt'));
+% elseif strcmp(Rlevel,'RL05')
+%     slrc20=load(fullfile(getenv('IFILES'),'SLR','C20_RL05_NH.txt'));
+% elseif strcmp(Rlevel,'RL06')
+%     slrc20=load(fullfile(getenv('IFILES'),'SLR','C20_RL06_NH.txt'));
+%    
+% end
+% % The sigma error is column 4
+% slrc20_error=slrc20(:,4)*1e-10;
+% % Remove the AOD1B model which was removed from the GRACE GSM data but
+% % restored to this SLR data.  Use the raw value (column 2). See data headers.
+% slrc20=[slrc20(:,1) slrc20(:,2)-slrc20(:,5)*1e-10];
+% % Convert the dates to Matlab format
+% [n,m]=size(slrc20);
+% slrc20(:,1)=datenum([slrc20(:,1) ones(n,1) ones(n,1)]);
+% % Make slrc20 relative to the WGS84 ellipsoid
+% slrc20(:,2) = slrc20(:,2) - j2;
+
+% New function that returns you the coefficients for degree L = 2 (and 3 
+% when available). Format is 3 columns: thedates, C20, C30. thedates are
+% the midpoint of the GRACE data month.
+[slrc20] = gracedeg2(Rlevel);
+
+% These are not referenced to anything, so make the 2,0 coefficient
+% relative to the WGS84 ellipsoid
 slrc20(:,2) = slrc20(:,2) - j2;
 
+
 % Degree 1 Correction Setup
-if Rlevel=='RL04'
-    deg1=load(fullfile(getenv('IFILES'),'GRACE','deg1_RL04_NH.txt'));
-elseif Rlevel=='RL05'
-    deg1=load(fullfile(getenv('IFILES'),'GRACE','deg1_RL05_NH.txt'));
-elseif Rlevel=='RL06'
-    deg1=load(fullfile(getenv('IFILES'),'GRACE','deg1_RL05_NH.txt'));
-     %the RL06 deg 1 will be updated once the updated data has been 
-     %released. For now the file being used is the updated RL05 one
-     %downloaded from the GRACE Tellus website
-end
-[n,m] = size(deg1);
-dates_str = num2str(deg1(:,1));
-deg1dates = datenum([str2num(dates_str(:,1:4)) str2num(dates_str(:,5:6)) 15*ones(n,1)]);
-[b,m] = unique(deg1dates);
-deg1dates = deg1dates(m);
-for i=1:n/2; temp = [deg1(2*i-1,2:7); deg1(2*i,2:7)]; mydeg1(i,:,:) = temp; end;
+
+% if Rlevel=='RL04'
+%     deg1=load(fullfile(getenv('IFILES'),'GRACE','deg1_RL04_NH.txt'));
+% elseif Rlevel=='RL05'
+%     deg1=load(fullfile(getenv('IFILES'),'GRACE','deg1_RL05_NH.txt'));
+% elseif Rlevel=='RL06'
+%     %deg1=load(fullfile(getenv('IFILES'),'GRACE','deg1_RL06_new.txt'));  % Technical note 11
+%     deg1=load(fullfile(getenv('IFILES'),'GRACE','deg1_RL06_Sun2016.txt'));  % Technical note 13
+% end
+% [n,m] = size(deg1);
+% dates_str = num2str(deg1(:,1));
+% deg1dates = datenum([str2num(dates_str(:,1:4)) str2num(dates_str(:,5:6)) 15*ones(n,1)]);
+% [b,m] = unique(deg1dates);
+% deg1dates = deg1dates(m);
+% for i=1:n/2; temp = [deg1(2*i-1,2:7); deg1(2*i,2:7)]; mydeg1(i,:,:) = temp; end;
+
+% New function that returns you the coefficients for degree L = 1. Format
+% should be identical to old code above.
+[deg1dates,mydeg1] = gracedeg1(Pcenter,Rlevel);
 
 
 % Initialize
@@ -217,6 +228,8 @@ cal_errors=nan(nmonths,addmup(Ldata),4);
 
 % Loop over the months
 for index = 1:nmonths 
+    disp(['Processing month number: ' num2str(index)]);
+    
     % load geopotential coefficients
     fname1=fullfile(ddir1,datanames{index});
 
@@ -281,28 +294,53 @@ for index = 1:nmonths
     monthmid = (monthstart+monthend)/2;
     thedates(index) = monthmid;
     
-    % Now replace the (2,0) coefficient with the SLR value (referenced to
-    % WGS84 above).
-    % NOTE: This gives a value different than if you used
-    % (column3 - column5) from the SLR data file because that data is
-    % referenced to an overall mean, not to the WGS 84 ellipsoid.
+    disp(['Month midpoint date: ' datestr(thedates(index))]);
+    
+    % Now replace the (2,0) and (3,0) (when available) coefficient with 
+    % the SLR value (referenced to WGS84 above).
+%     % NOTE: This gives a value different than if you used
+%     % (column3 - column5) from the SLR data file because that data is
+%     % referenced to an overall mean, not to the WGS 84 ellipsoid.
+%     %if index==111; keyboard; end;
     where=slrc20(:,1)>monthstart & slrc20(:,1)<monthend;
     if ~any(where)
         % If there is no SLR value within our specific interval, 
         % use the closest value we have
         [~,where]=min(abs(monthmid - slrc20(:,1)));
+        disp('No SLR coefficients for this month, used nearest available.')
+    elseif nnz(where) > 1
+        % We have more than one month. Use the closest value
+        [~,where]=min(abs(monthmid - slrc20(:,1)));
+        disp(['More than one degree 2 value detected, likely from overlapping months. Used nearest: ' datestr(slrc20(where,1))]) 
     end
+    % else we just use "where" which only has 1 valid entry
+    
     % Need to use slrc20(where,2)
     disp(sprintf('C20 was %12.8e now %12.8e',lmcosi_month(4,3),slrc20(where,2)))
     lmcosi_month(4,3)=slrc20(where,2);
+    % Now replace C3,0 if possible
+    if isfinite(slrc20(where,3))
+        % Here we have a C3,0 SLR value available, so substitute.
+        disp(sprintf('C30 was substituted; it was %12.8e now %12.8e',lmcosi_month(7,3),slrc20(where,3)))
+        lmcosi_month(7,3)=slrc20(where,3);
+    end
     
-    % Now replace the degree 1 coefficients with those from Swenson et al.(2008)
     
+    % Now replace the degree 1 coefficients with those from GRACEDEG1.m and
+    % references therin.
+    
+    % Find a degree 1 data point that is within the month of our GRACE data
     where1=deg1dates(:)>monthstart & deg1dates(:)<monthend;
     if ~any(where1)
         % If there is no Deg1 value within our specific interval, 
-        % don't change anything, because we know the first few months are missing
+        % don't change anything, because we know a few months are missing
         disp('No change to degree 1')
+    elseif nnz(where1) > 1
+        % We have more than one month. Use the closest value
+        disp('More than one degree 1 value detected')
+        [~,where1]=min(abs(monthmid - deg1dates));
+        lmcosi_month(2:3,1:4)=squeeze(mydeg1(where1,:,1:4));
+        disp(['Deg1 value for ' datestr(deg1dates(where1)) ' used.']);
     else
         disp(['Deg1 value for ' datestr(deg1dates(where1)) ' used.']);
         lmcosi_month(2:3,1:4)=squeeze(mydeg1(where1,:,1:4));
@@ -427,16 +465,19 @@ if (strcmp(Pcenter,'CSR') || strcmp(Pcenter,'JPL')) && (strcmp(Rlevel,'RL05')...
     
     end % We have no errors?
     
-    disp(['Processed month number: ' num2str(index)]);
+    disp(['Completed month number: ' num2str(index)]);
+    disp(' ')
 end
 
 % Save
-save(fnpl,'potcoffs','cal_errors','thedates');
+save(fnpl,'potcoffs','thedates');
 
    
 
 end % End if we have a save file already
 
 % Collect output
-varns={potcoffs,cal_errors,thedates};
+% Here we have "thedates" twice so that we don't break older code. But in
+% the future we will fix this so that we only have the two output
+varns={potcoffs,thedates,thedates};
 varargout=varns(1:nargout);
