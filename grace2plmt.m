@@ -1,4 +1,4 @@
-function varargout=grace2plmt(Pcenter,Rlevel,units,forcenew)
+function varargout=grace2plmt(Pcenter,Rlevel,Ldata,units,forcenew)
 % [potcoffs,cal_errors,thedates]=GRACE2PLMT(Pcenter,Rlevel,units,forcenew)
 %
 % This program reads in the Level-2 GRACE geoid products from either the CSR or
@@ -18,6 +18,10 @@ function varargout=grace2plmt(Pcenter,Rlevel,units,forcenew)
 %             'GFZ' data center at the GeoForschungsZentrum Potsdam
 % Rlevel      The release level of the solution you want.  
 %              Either 'RL04','RL05', or 'RL06'
+% Ldata       The bandwidth of the dataproduct that you want [default: 60].
+%              In the case where there are more than one product from a
+%              datacenter (such as BA 60 or BB 96 standard L2 products)
+%              this allows you to choose between them.
 % units       'POT' or 'SD' for whether you want geopotential or surface
 %               mass density
 % forcenew    Whether or not you want to force new generation of a save file
@@ -31,6 +35,10 @@ function varargout=grace2plmt(Pcenter,Rlevel,units,forcenew)
 %    thedates       time stamps in Matlab time
 %
 % NOTE:
+%
+%   5/18/2022 Added L to the inputs so that we can utilize more than one
+%    product from a data center. A corresponding change has been made in
+%    GRACE2SLEPT
 %
 %   2/19/2021 Formal or calibrated uncertainties have not been reported 
 %    since RL04 so we will discontinue the output of these. The output
@@ -49,9 +57,9 @@ function varargout=grace2plmt(Pcenter,Rlevel,units,forcenew)
 %
 %
 % EXAMPLE: to make a new save file when you have added more months
-% [potcoffs,thedates]=grace2plmt('CSR','RL06','SD',1);
+% [potcoffs,thedates]=grace2plmt('CSR','RL06',60,'SD',1);
 %
-% Last modified by charig-at-email.arizona.edu, 2/2/2022
+% Last modified by charig-at-email.arizona.edu, 5/18/2022
 % Last modified by lashokkumar-at-arizona.edu, 11/09/2020
 % Last modified by mlubeck-at-email.arizona.edu, 03/18/2019
 % Last modified by fjsimons-at-alum.mit.edu, 05/17/2011
@@ -63,6 +71,7 @@ function varargout=grace2plmt(Pcenter,Rlevel,units,forcenew)
 % Determine parameters and set defaults
 defval('Pcenter','CSR')
 defval('Rlevel','RL06')
+defval('Ldata','60')
 defval('units','SD')
 defval('forcenew',1)
 
@@ -73,9 +82,9 @@ defval('ddir1',fullfile(getenv('IFILES'),'GRACE','Originals',Rlevel,Pcenter));
 defval('ddir2',fullfile(getenv('IFILES'),'GRACE'));
 % And the name of that save file
 if strcmp(units,'SD')
-    fnpl=sprintf('%s/%s_%s_alldata_%s.mat',ddir2,Pcenter,Rlevel,units);
+    fnpl=sprintf('%s/%s_%s_alldata_%s_%s.mat',ddir2,Pcenter,Rlevel,num2str(Ldata),units);
 elseif strcmp(units,'POT')
-    fnpl=sprintf('%s/%s_%s_alldata.mat',ddir2,Pcenter,Rlevel);
+    fnpl=sprintf('%s/%s_%s_alldata_%s.mat',ddir2,Pcenter,Rlevel,num2str(Ldata));
 else
     error ('The unit input is not valid.')
 end
@@ -117,7 +126,14 @@ elseif  strcmp(Pcenter,'CSR')
     elseif strcmp(Rlevel,'RL05')
        datanames=ls2cell(fullfile(ddir1,'GSM*0060_0005'));
     elseif strcmp(Rlevel,'RL06')
-       datanames=ls2cell(fullfile(ddir1,'GSM*BA01_0600'));
+       % 5/12/2022 GR-FO only now version 6.1
+       if Ldata == 60
+           datanames=[ls2cell(fullfile(ddir1,'GSM*BA01_0600')) ls2cell(fullfile(ddir1,'GSM*BA01_0601'))];
+       elseif Ldata == 96
+           datanames=[ls2cell(fullfile(ddir1,'GSM*BB01_0600')) ls2cell(fullfile(ddir1,'GSM*BB01_0601'))];
+       else
+           error(['Solutions with requested L=' num2str(Ldata) ' not currently stored']);
+       end
        % Naming convention was changed for RL06 where BA stands
        % for degree 60 gravity solution and 01 represents unconstrained
        % spherical harmonic solution with a boxcar windowing function 
@@ -131,9 +147,8 @@ elseif  strcmp(Pcenter,'CSR')
        % Rl05 previosly. The PID naming convention stays the same.    
     end
     % Know a priori what the bandwidth of the coefficients is
-    Ldata=60;
+    % Ldata=60;
 elseif  strcmp(Pcenter,'JPL')
-    %Do we want to continue JPL support?
     if strcmp(Rlevel,'RL05')
        datanames=ls2cell(fullfile(ddir1,'GSM*JPLEM*0005'));
        % JPL Release Level 5 has no calibrated error files

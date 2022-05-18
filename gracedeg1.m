@@ -49,8 +49,8 @@ defval('ddir2',fullfile(getenv('IFILES'),'GRACE','Degree1'));
 
 % The name of the original data files
 if strcmp(Rlevel,'RL06')
-    fnpl1=sprintf('%s/TN-13_GEOC_%s_%s.txt',ddir1,Pcenter,Rlevel);
-    fnpl2=sprintf('%s/TN-13_GEOC_%s_%s.mat',ddir2,Pcenter,Rlevel);
+    fnpl1=sprintf('%s/TN-13_GEOC_%s_%s.txt',ddir1,Pcenter,'RL0601');
+    fnpl2=sprintf('%s/TN-13_GEOC_%s_%s.mat',ddir2,Pcenter,'RL0601');
 elseif strcmp(Rlevel,'RL05')
     fnpl1=sprintf('%s/deg1_RL05_NH.txt',ddir1);
     fnpl2=sprintf('%s/deg1_RL05_NH.mat',ddir2);

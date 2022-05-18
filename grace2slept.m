@@ -2,27 +2,20 @@ function varargout=grace2slept(Dataproduct,TH,XY_buffer,Lwindow,phi,theta,omega,
 % [slepcoffs,calerrors,thedates,TH,G,CC,V]
 %                 =GRACE2SLEPT(Dataproduct,TH,XY_buffer,Lwindow,phi,theta,omega,J,units,forcenew)
 %
-% This program reads in the Level-2 GRACE geoid products from either the CSR or
-% GFZ data centers, does some processing, and saves them as a slept matrix
-% in a .mat file.  In particular, the coefficients are reordered to our
-% prefered lmcosi format, they are referenced to the WGS84 ellipsoid, and
-% the C2,0 coefficients are replaced with more accurate measurements from
-% satellite laser ranging.  You have the option of leaving them as geopotential 
-% or converting them to surface mass density using the method of 
-% Wahr et al. 1998, based on Love numbers (see PLM2POT).  They are then 
-% projected into a chosen Slepian basis.  All output is SORTED by the 
-% global eigenvalue.
+% This program takes GRACE/GRACE-FO gravimetry data created by GRACE2PLM
+% and projects this data into the requested Slepian basis.
+%
 %
 % INPUT:
 % 
-% Dataproduct   'CSRRL04' Release level 04 data from the data center 
-%                  at the Center for Space Research
-%               'CSRRL05' Release level 05 data from the data center 
-%                  at the Center for Space Research
-%               'GFZRL04' Release level 04 data from the data center
-%                  at the GeoForschungsZentrum Potsdam
-%               'GFZRL05' Release level 05 data from the data center
-%                  at the GeoForschungsZentrum Potsdam
+% Dataproduct   This is a cell array with three parts: a) the data center,
+%                 b) the release level, and c) the dataproduct bandwidth. 
+%                 [default: {'CSR', 'RL06', 60} which is Release level 06 
+%                 data from the data center]
+%                 at the Center for Space Research
+%                 Another Example: {'GFZ', 'RL05', 96} which is Release 
+%                 level 05 data from the data center at the 
+%                 GeoForschungsZentrum Potsdam
 % TH         Radius of the concentration region (degrees) OR
 %              'england', 'eurasia',  'namerica', 'australia', 'greenland'
 %              'africa', 'samerica', 'amazon', 'orinoco', in which case 
@@ -64,11 +57,12 @@ function varargout=grace2slept(Dataproduct,TH,XY_buffer,Lwindow,phi,theta,omega,
 %
 % SEE ALSO: PLM2SLEP
 %
-% Last modified by charig-at-princeton.edu, 03/16/2016
+%
+% Last modified by charig-at-princeton.edu, 05/18/2022
 % Last modified by fjsimons-at-alum.mit.edu, 06/26/2012
 
 % Determine parameters and set defaults
-defval('Dataproduct','CSRRL05')
+defval('Dataproduct',{'CSR', 'RL06', 60})
 defval('TH','greenland')
 defval('Lwindow',18)
 defval('phi',0)
@@ -79,8 +73,10 @@ defval('XY_buffer',0)
 defval('pars',10);
 defval('units','POT')
 defval('inout','out')
-Pcenter = Dataproduct(1:3);
-Rlevel = Dataproduct(4:end);
+Pcenter = Dataproduct{1};
+Rlevel = Dataproduct{2};
+Ldata = Dataproduct{3};
+dataproductstring = [Pcenter Rlevel num2str(Ldata)];
 
 % Figure out if it's lowpass or bandpass
 lp=length(Lwindow)==1;
@@ -103,10 +99,10 @@ if ~isstr(TH) && length(TH)==1 % POLAR CAPS
     end
     if lp
         fnpl=sprintf('%s/grace2slept-%s-CAP-%i-%i-%i-%s.mat',...
-            ddir2,Dataproduct,TH,Lwindow,J,units);
+            ddir2,dataproductstring,TH,Lwindow,J,units);
     elseif bp
         fnpl=sprintf('%s/grace2sleptbl-%s-CAP-%i-%i-%i-%i-%s.mat',...
-            ddir2,Dataproduct,TH,Lwindow(1),Lwindow(2),J,units);
+            ddir2,dataproductstring,TH,Lwindow(1),Lwindow(2),J,units);
     else
         error('The degree range is either one or two numbers')       
     end 
@@ -131,10 +127,10 @@ else % GEOGRAPHICAL REGIONS and XY REGIONS
     % The name of the save file
     if lp
         fnpl=sprintf('%s/grace2slept-%s-%s-%i-%i-%s.mat',...
-            ddir2,Dataproduct,h,Lwindow,J,units);
+            ddir2,dataproductstring,h,Lwindow,J,units);
     elseif bp
         fnpl=sprintf('%s/grace2sleptbl-%s-%s-%i-%i-%i-%s.mat',...
-            ddir2,Dataproduct,h,Lwindow(1),Lwindow(2),J,units);
+            ddir2,dataproductstring,h,Lwindow(1),Lwindow(2),J,units);
     else
         error('The degree range is either one or two numbers')
     end
@@ -192,7 +188,7 @@ else
     % Use GRACE2PLMT to get the GRACE data.  This way, if we have it saved,
     % there is no need to scan the month files again.  GRACE2PLMT takes 
     % care of the WGS84 adjustment, the degree 1 correction, and the C20 correction. 
-    [potcoffs,cal_errors,thedates]=grace2plmt(Pcenter,Rlevel,units,0);
+    [potcoffs,cal_errors,thedates]=grace2plmt(Pcenter,Rlevel,Ldata,units,0);
     % *** Here I changed this. Run grace2plmt once to update your data, and
     % then when you call forcenew=1 from now on it will just update the
     % expansion
@@ -204,7 +200,7 @@ else
 
     % Limit everything to the window bandwidth
     potcoffsW = potcoffs(:,1:size(lmcosiW,1),1:4);
-    cal_errorsW = cal_errors(:,1:size(lmcosiW,1),1:4);
+    %cal_errorsW = cal_errors(:,1:size(lmcosiW,1),1:4);
 
     % Loop over the months
     for index = 1:nmonths
@@ -214,19 +210,22 @@ else
             potcoffs_month(2*size(potcoffs_month,1)+ronmW(1:(maxL+1)^2))'*G;
 
         % Expand this month of CALIBRATED ERRORS into the Slepian basis
-        calerrors_month=squeeze(cal_errorsW(index,:,:));
-        slepcalerrors(index,:) = ...
-            calerrors_month(2*size(calerrors_month,1)+ronmW(1:(maxL+1)^2))'*G;
+        %calerrors_month=squeeze(cal_errorsW(index,:,:));
+        %slepcalerrors(index,:) = ...
+        %    calerrors_month(2*size(calerrors_month,1)+ronmW(1:(maxL+1)^2))'*G;
     end
-        
+       
+
     % SAVE
+    % Here we have "thedates" twice so that we don't break older code. But in
+    % the future we will fix this so that we don't have cal errors
     % Don't save the kernel and eigenfunctions because we already have 
     % this info saved and can load from GLMALPHA
     % save(fnpl,'slepcoffs','calerrors','thedates','G','CC','V');
-    save(fnpl,'slepcoffs','slepcalerrors','thedates');
+    save(fnpl,'slepcoffs','thedates','thedates');
 
 end % End if we have a save file already
 
 % Collect output
-varns={slepcoffs,slepcalerrors,thedates,TH,G,CC,V,N};
+varns={slepcoffs,thedates,thedates,TH,G,CC,V,N};
 varargout=varns(1:nargout);
