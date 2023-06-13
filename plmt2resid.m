@@ -42,7 +42,7 @@ function varargout=plmt2resid(plmt,thedates,fitwhat,givenerrors)
 %
 % SEE ALSO:
 %
-% Last modified by charig-at-princeton.edu 5/24/2011
+% Last modified by charig-at-princeton.edu 5/29/2023
 % Last modified by fjsimons-at-alum.mit.edu 5/26/2011
 
 defval('xver',0)
@@ -57,7 +57,7 @@ if isstr(plmt)
   % These would be with the "formal" errors
   % givenerrros=a.potcoffs(:,:,[1 2 5:6]);
   % Much better to use the "calibrated" errors
-  givenerrors=a.cal_errors(:,:,1:4);
+  %givenerrors=a.cal_errors(:,:,1:4);
   % Now get the thedates for each of those months
   thedates=a.thedates;
   % Get rid of the rest
