@@ -127,10 +127,11 @@ elseif  strcmp(Pcenter,'CSR')
        datanames=ls2cell(fullfile(ddir1,'GSM*0060_0005'));
     elseif strcmp(Rlevel,'RL06')
        % 5/12/2022 GR-FO only now version 6.1
+       % 11/12/2023 GR-FO only now version 6.2
        if Ldata == 60
-           datanames=[ls2cell(fullfile(ddir1,'GSM*BA01_0600')) ls2cell(fullfile(ddir1,'GSM*BA01_0601'))];
+           datanames=[ls2cell(fullfile(ddir1,'GSM*BA01_0600')) ls2cell(fullfile(ddir1,'GSM*BA01_0602'))];
        elseif Ldata == 96
-           datanames=[ls2cell(fullfile(ddir1,'GSM*BB01_0600')) ls2cell(fullfile(ddir1,'GSM*BB01_0601'))];
+           datanames=[ls2cell(fullfile(ddir1,'GSM*BB01_0600')) ls2cell(fullfile(ddir1,'GSM*BB01_0602'))];
        else
            error(['Solutions with requested L=' num2str(Ldata) ' not currently stored']);
        end
