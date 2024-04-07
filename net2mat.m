@@ -5,6 +5,12 @@ function varargout=net2mat(datanames,varlist,savedir)
 % returns the data, and saves them into a .mat file.  It can operate on a
 % single file, multiple files, or a directory.
 %
+% This version is for the situation where you have many of the same files
+% and want the same variable in each file. For example, to process a
+% timeseries of GLDAS files to create a timeseries of terrestrial water
+% storage. If you have many files and want to keep their .mat files
+% separate, then use NET2MATS. For example, to process multiple GMT .grd
+% files into .mat files.
 %
 % INPUT:
 % 
@@ -31,7 +37,7 @@ function varargout=net2mat(datanames,varlist,savedir)
 % EXAMPLE:
 % [data1,data2] = net2mat('mynetcdffile.nc',{'variable1' 'variable2'});
 %
-% Last modified by charig-at-princeton.edu, 09/03/2014
+% Last modified by charig-at-arizona.edu, 04/01/2024
 
 defval('varlist',[]);
 defval('allsame',1);

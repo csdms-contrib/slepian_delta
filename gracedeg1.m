@@ -1,5 +1,5 @@
 function varargout=gracedeg1(Pcenter,Rlevel)
-% [potcoffs,cal_errors,thedates]=GRACE2PLMT(Pcenter,Rlevel,units,forcenew)
+% [thedates,deg1data]=GRACEDEG1(Pcenter,Rlevel)
 %
 % This function reads and formats the degree-1 spherical harmonic
 % correction from GRACE/GRACE-FO Technical Note 13.
@@ -15,11 +15,12 @@ function varargout=gracedeg1(Pcenter,Rlevel)
 % OUTPUT:
 % 
 % Returns these variables and saves them in a .mat file:
-%    thedates       time stamps in Matlab time
+%    thedates       time stamps in Matlab time. This date is the midpoint
+%                      of the GRACE month data span.
 %    deg1data       potential coefficients for just degree l = 1
 %                      [nmonths x 2 x 4]
 %
-% NOTE:
+% NOTES:
 %
 % The GRACE degree-1 correction data are distributed in Technical Note 13,
 %   TN-13. There is one for each datacenter because the GRACE coefficients
@@ -32,7 +33,7 @@ function varargout=gracedeg1(Pcenter,Rlevel)
 %   the TN-13 document is newer, then we use it to create a new .mat file
 %   and then load the .mat file.
 %
-% Last modified by charig-at-email.arizona.edu, 03/24/2021
+% Last modified by charig-at-arizona.edu, 11/18/2021
 
 % Determine parameters and set defaults
 defval('Pcenter','CSR')
@@ -48,8 +49,8 @@ defval('ddir2',fullfile(getenv('IFILES'),'GRACE','Degree1'));
 
 % The name of the original data files
 if strcmp(Rlevel,'RL06')
-    fnpl1=sprintf('%s/TN-13_GEOC_%s_%s.txt',ddir1,Pcenter,Rlevel);
-    fnpl2=sprintf('%s/TN-13_GEOC_%s_%s.mat',ddir2,Pcenter,Rlevel);
+    fnpl1=sprintf('%s/TN-13_GEOC_%s_%s.txt',ddir1,Pcenter,'RL0602');
+    fnpl2=sprintf('%s/TN-13_GEOC_%s_%s.mat',ddir2,Pcenter,'RL0602');
 elseif strcmp(Rlevel,'RL05')
     fnpl1=sprintf('%s/deg1_RL05_NH.txt',ddir1);
     fnpl2=sprintf('%s/deg1_RL05_NH.mat',ddir2);
@@ -67,7 +68,7 @@ d2 = dir(fnpl2);
 
 % If this file already exists, and it is more new than the source file, 
 % then load it.  Otherwise make a new one and return that one. This should
-% automatically make and use a new .mat file if you update the source file.
+% automatically make and use a new .mat file if you update the source (TN-13) file.
 if ~(exist(fnpl2,'file')==2) || datenum(d1.date) > datenum(d2.date)
      % Here create a new save file to use.
      % This is reversed from our typical if, exist, load convention because
@@ -86,6 +87,7 @@ if ~(exist(fnpl2,'file')==2) || datenum(d1.date) > datenum(d2.date)
      
      % Now do a formatted text scan on the data
      C = textscan(fid,'%s%d%d%f%f%f%f%s%s%s');
+     % Use string format for the dates so we can easily send it to datenum
      fclose(fid);
              
      % What we actually want is a 3 dimensional cell array with the date as
