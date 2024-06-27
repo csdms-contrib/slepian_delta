@@ -73,6 +73,9 @@ if iscell(datanames)
         [filepath,name,ext] = fileparts(datanames{i});
         save([filepath filesep name '.mat'],varlist{:})
 
+        % Save the variable list for output
+        allvariables{i} = varlist;
+
     end
     disp(['NET2MAT: ' num2str(length(datanames)) ' data files read and'...
         ' saved as mat files.'])
@@ -99,12 +102,16 @@ elseif exist(datanames)==2
     [filepath,name,ext] = fileparts(datanames{i});
     save([filepath filesep name '.mat'],varlist{:})
 
+    % Save the variable list for output
+    allvariables{i} = varlist;
+
 elseif exist(datanames)==7
     % It is a directory, so we run ls2cell on the contents and then net2mats
     defval('savedir',datanames);
-    cls=ls2cell([datanames '*' extension],1); 
     % We want only certain files in there.
-    [datanames,thevars] = net2mats(cls,varlist,savedir);
+    cls=ls2cell([datanames '*' extension],1); 
+    % 
+    [datanames,allvariables] = net2mats(cls,[],varlist,savedir);
 
     %for k=1:length(varlist); eval([varlist{k} '= thevars{k};']); end;
     
@@ -113,22 +120,16 @@ else
     error('Problem with your data name. Directories need fullfile paths!')
 end
 
-% % Create the mat files
+% The list of files that were read in
 varns{1} = datanames;
-% for j=1:length(varlist)
-%     if exist(savedir)
-%         % Directories already end with "filesep"
-%         save([savedir v{j} '.mat'],v{j}); 
-%     else
-%         save([v{j} '.mat'],v{j});
-%     end
-%     varns{j+1} = eval([v{j}]); 
-% end
+% The list of variables
+varns{2} = allvariables;
 
     
 % Provide all the output
-varargout{1}=varns{1};
-varargout{2} = {varns{2:end}};
+varargout = varns;
+%varargout{1}=varns{1};
+%varargout{2} = {varns{2:end}};
 
 
 

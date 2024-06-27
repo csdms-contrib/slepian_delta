@@ -129,7 +129,7 @@ miniK=miniK/4/pi;
 % Compare with KERNELC
 defval('xver',0)
 if xver==1
-  KK=rindeks(kernelc(Lmax,dom),1);
+  KK=rindeks(kernelcp(Lmax,dom),1);
   % This then makes miniK(1) the fractional area on the sphere
   % Check by comparing to output from spharea, if you want
   % Note: SPHAREA defaults to 17 abcissas and weights, while this code uses 101.
@@ -165,7 +165,7 @@ elseif strcmp(lmcosi,'demo1')
   degres=[];
   [Bl,dels,r,lon,lat,lmcosi]=geoboxcap(L,dom,[],degres,1);
   [Int,A,miniK,XY]=plm2avg(lmcosi,dom);
-  maps=plotplm(lmcosi,[],[],4,degres); colorbar
+  maps=plotplm(lmcosi,[],[],1,degres); colorbar
   % Really dumb thing 
   %sum(maps(:))*2*pi/size(maps,2)*pi/size(maps,1)/4/pi 
   disp(' '); A1=spharea(XY);

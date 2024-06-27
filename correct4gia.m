@@ -102,6 +102,10 @@ function varargout=correct4gia(thedates,model,TH,L,phi,theta,omega)
 %    sea-level change and present-day uplift rates. Geophysical Journal 
 %    International 190, 1464-1482. doi:10.1111/j.1365-246X.2012.05557.x
 %
+%   Steffen, H. (2021). Surface Deformations from Glacial Isostatic 
+%    Adjustment Models with Laterally Homogeneous, Compressible Earth 
+%    Structure (1.0) [Data set]. Zenodo. https://doi.org/10.5281/zenodo.5560862.
+%
 % Last modified by charig-at-email.arizona.edu on 5/23/2017
 
 %defval('TH',{'greenland' 0.5});

@@ -7,7 +7,9 @@ function varargout=cov2plm(Clmlmp,howmany)
 %
 % INPUT:
 %
-% Clmlmp        The covariance matrix of a set of spherical harmonics.
+% Clmlmp        The covariance matrix of a set of spherical harmonics. This
+%                 should be in the m ordering of kernelc and addmon, 
+%                 i.e. 0 0 -1 1 0 -1 1 -2 2  
 % howmany       The number of noise realizations you want [default: 1]
 %            
 % OUTPUT:
@@ -34,9 +36,10 @@ defval('howmany',1);
 
 if isstr(Clmlmp)
   % Evaluate the specified expression, and calculate a new covariance matrix
-  [plmt,givenerrors,thedates] = eval(Clmlmp);
-  [ESTresid]=plmt2resid(plmt,thedates,[1 1 365.0],givenerrors);
-  [Clmlmp]=plmresid2cov(ESTresid);
+  %[plmt,givenerrors,thedates] = eval(Clmlmp);
+  %[ESTresid]=plmt2resid(plmt,thedates,[1 1 365.0],givenerrors);
+  %[Clmlmp]=plmresid2cov(ESTresid);
+  error('CH: Need to fix ordering of plmresid2cov')
 end
 
 % Decompose the covariance
@@ -57,14 +60,15 @@ end
 % How much data do we have?
 Ldata = addmoff(m,'r');
 % Get empty matrix and info for the data bandlimit
-[~,~,~,lmcosidata,~,~,~,~,~,ronmdata]=addmon(Ldata);
+[~,~,~,lmcosidata,~,mzodata]=addmon(Ldata);
 
 % Make a synthetic noise realization
 for i=1:howmany
    syntheticnoise = randn(1,n)*T;
    % Reorder the noise into lmcosi
    temp1=lmcosidata(:,3:4);
-   temp1(ronmdata) = syntheticnoise(:);
+   % mzo assumes Clmlmp has the same ordering as kernelc and addmon
+   temp1(mzodata) = syntheticnoise(:);
    lmcosiS(:,:,i) = [lmcosidata(:,1:2) temp1];
 end
 
