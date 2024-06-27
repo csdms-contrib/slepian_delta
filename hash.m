@@ -18,7 +18,7 @@ function h = hash(inp,meth)
 %                     'abc'
 %                     uint8('abc')
 %                     char([97 98 99])
-%            The hash of the follwing will be different from the above,
+%            The hash of the following will be different from the above,
 %            because class "double" uses eight byte elements:
 %                     double('abc')
 %                     [97 98 99]
