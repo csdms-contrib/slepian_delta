@@ -101,22 +101,53 @@
 %    sea-level change and present-day uplift rates. Geophysical Journal
 %    International 190, 1464-1482. doi:10.1111/j.1365-246X.2012.05557.x
 %
-% Last modified by charig-at-email.arizona.edu on 5/23/2017
-function varargout = correct4gia(thedates, model, TH, L, phi, theta, omega)
+% Last modified by 
+%   charig-at-email.arizona.edu on 5/23/2017
+%   williameclee-at-arizona.edu on 7/12/2024
 
-    %defval('TH',{'greenland' 0.5});
-    defval('L', 60);
-    defval('phi', 0);
-    defval('theta', 0);
-    defval('omega', 0);
+function varargout = correct4gia_new(varargin)
+    %% Initialisation
+    thedatesDefault = datenum(2004, 1:12, 1); %#ok<DATNM>
+    modelDefault = 'W12a_v1';
+    DomainDefault = {'greenland', 0.5};
+    LDefault = 60;
+    phiDefault = 0;
+    thetaDefault = 0;
+    omegaDefault = 0;
+    p = inputParser;
+    addOptional(p, 'thedates', thedatesDefault, ...
+        @(x) isnumeric(x) || isempty(x));
+    addOptional(p, 'Model', modelDefault, ...
+        @(x) ischar(x) || isempty(x));
+    addOptional(p, 'Region', DomainDefault, ...
+        @(x) isnumeric(x) || iscell(x) || ischar(x));
+    addOptional(p, 'L', LDefault, ...
+        @(x) isnumeric(x) || isempty(x));
+    addOptional(p, 'phi', phiDefault, ...
+        @(x) isnumeric(x) || isempty(x));
+    addOptional(p, 'theta', thetaDefault, ...
+        @(x) isnumeric(x) || isempty(x));
+    addOptional(p, 'omega', omegaDefault, ...
+        @(x) isnumeric(x) || isempty(x));
+    addOptional(p, 'MoreRegionSpecs', {}, @iscell);
+    addParameter(p, 'BeQuiet', false, @islogical);
+    parse(p, varargin{:});
+    thedates = conddefval(p.Results.thedates, thedatesDefault);
+    model = conddefval(p.Results.Model, modelDefault);
+    TH = conddefval(p.Results.Region, DomainDefault);
+    L = conddefval(p.Results.L, LDefault);
+    phi = conddefval(p.Results.phi, phiDefault);
+    theta = conddefval(p.Results.theta, thetaDefault);
+    omega = conddefval(p.Results.omega, omegaDefault);
+    moreRegionSpecs = p.Results.MoreRegionSpecs;
+    beQuiet = p.Results.BeQuiet;
 
-    %%%
-    % INITIALIZATION
-    %%%
+    if iscell(TH) && length(TH) > 2
+        moreRegionSpecs = {TH{3:end}, moreRegionSpecs{:}}; %#ok<CCAT>
+        TH = TH{1:2};
+    end
 
-    defval('thedates', datenum(2004, 1:12, 1))
-    defval('model', 'W12a_v1')
-    defval('xver', 0)
+    xver = 0;
 
     % Where the model save files are kept
     if strncmp(model, 'Morrow', 6)
@@ -129,18 +160,15 @@ function varargout = correct4gia(thedates, model, TH, L, phi, theta, omega)
     fnpl = sprintf('%s/%s_SD.mat', ddir1, model);
 
     % Load this data (saved as lmcosiM)
-    load(fnpl);
+    load(fnpl, 'lmcosiM', 'lmcosiU', 'lmcosiL');
 
-    %%%
-    % Calculation
-    %%%
-
+    %% Main
     % Convert the model from change per year to change per day
-    lmcosiM = [lmcosiM(:, 1:2) lmcosiM(:, 3:4) / 365];
+    lmcosiM = [lmcosiM(:, 1:2), lmcosiM(:, 3:4) / 365];
 
     if exist('lmcosiU', 'var') && exist('lmcosiL', 'var')
-        lmcosiU = [lmcosiU(:, 1:2) lmcosiU(:, 3:4) / 365];
-        lmcosiL = [lmcosiL(:, 1:2) lmcosiL(:, 3:4) / 365];
+        lmcosiU = [lmcosiU(:, 1:2), lmcosiU(:, 3:4) / 365];
+        lmcosiL = [lmcosiL(:, 1:2), lmcosiL(:, 3:4) / 365];
     end
 
     % Reference the date string to the first date
@@ -154,24 +182,24 @@ function varargout = correct4gia(thedates, model, TH, L, phi, theta, omega)
         end
 
         % Figure out if it's lowpass or bandpass
-        lp = length(L) == 1;
-        bp = length(L) == 2;
+        % lp = length(L) == 1;
+        % bp = length(L) == 2;
         maxL = max(L);
         % The spherical harmonic dimension
-        ldim = (L(2 - lp) + 1) ^ 2 - bp * L(1) ^ 2;
+        % ldim = (L(2 - lp) + 1) ^ 2 - bp * L(1) ^ 2;
 
         % Project the model
         [~, ~, ~, lmcosiW, ~, ~, ~, ~, ~, ronm] = addmon(maxL);
 
         if isnumeric(TH)
-            [falpha, V, N, ~, G] = plm2slep(lmcosiM, TH, L, phi, theta, omega);
+            [falpha, ~, N, ~, G] = plm2slep_new(lmcosiM, TH, L, phi, theta, omega, "BeQuiet", beQuiet);
         else
-            [falpha, V, N, ~, G] = plm2slep(lmcosiM, TH, L);
+            [falpha, ~, N, ~, G] = plm2slep_new(lmcosiM, TH, L, "MoreRegionSpecs", moreRegionSpecs, "BeQuiet", beQuiet);
         end
 
         if exist('lmcosiU', 'var') && exist('lmcosiL', 'var')
-            [falphaU] = plm2slep(lmcosiU, TH, L);
-            [falphaL] = plm2slep(lmcosiL, TH, L);
+            [falphaU] = plm2slep_new(lmcosiU, TH, L);
+            [falphaL] = plm2slep_new(lmcosiL, TH, L);
         end
 
         % Scale to the new dates
@@ -185,7 +213,7 @@ function varargout = correct4gia(thedates, model, TH, L, phi, theta, omega)
 
             if xver && i == 12
                 % Collect the eigenvector output into a format that PLM2XYZ knows how to interpret
-                for j = 1:round(N)
+                for j = 1:round(N) %#ok<UNRCH>
                     % Create the blanks
                     cosi = lmcosiW(:, 3:4);
                     % Stick in the coefficients of the 1st eigentaper
@@ -212,15 +240,15 @@ function varargout = correct4gia(thedates, model, TH, L, phi, theta, omega)
         for j = 1:round(N)
             cosi = lmcosiW(:, 3:4);
             cosi(ronm) = G(:, j);
-            CC{j} = [lmcosiW(:, 1:2) cosi];
+            CC{j} = [lmcosiW(:, 1:2), cosi];
         end
 
-        [eigfunINT] = integratebasis(CC, TH, round(N));
+        [eigfunINT] = integratebasis(CC, TH, round(N), "MoreRegionSpecs", moreRegionSpecs);
         % Since Int should have units of (fn * m^2), need to go from fractional
         % sphere area to real area.  If the fn is surface density, this output is
         % in kilograms.  Then change the units from kg to Gt in METRIC tons
         eigfunINT = eigfunINT * 4 * pi * 6370000 ^ 2/10 ^ 3/10 ^ 9;
-        functionintegrals = eigfunINT;
+        % functionintegrals = eigfunINT;
 
         % Now multiply by the appropriate slepcoffs to get the months
         % This becomes alpha by months
@@ -240,7 +268,7 @@ function varargout = correct4gia(thedates, model, TH, L, phi, theta, omega)
             end
 
             if xver && i == 2
-                plotplm(squeeze(lmcosiGIA(i, :, :)), [], [], 4, 1)
+                plotplm(squeeze(lmcosiGIA(i, :, :)), [], [], 4, 1) %#ok<USENS,UNRCH>
                 pause
             end
 
@@ -249,13 +277,11 @@ function varargout = correct4gia(thedates, model, TH, L, phi, theta, omega)
         total = 0;
     end % end if exist
 
-    %%%
-    % OUTPUT
-    %%%
+    %% Returning requested outputs
     if exist('lmcosiU', 'var') && exist('lmcosiL', 'var')
-        varns = {thedates, GIAt, GIAtU, GIAtL};
+        varargout = {thedates, GIAt, GIAtU, GIAtL};
     else
-        varns = {thedates, GIAt, [], [], total};
+        varargout = {thedates, GIAt, [], [], total};
     end
 
-    varargout = varns(1:nargout);
+end

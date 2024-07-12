@@ -27,10 +27,10 @@
 %               two dimensional matrix (not a cell array), where the first
 %               dimension is time, and the second dimension are Slepian
 %               coefficients sorted by global eigenvalue.
-% dates         An array of dates corresponding to the slept timeseries.
+% dates         An array of dates corresponding to the sleptCoeffs timeseries.
 %               The unit is datenum.
-%               ***It is assumed that 'dates' matches 'slept'. If
-%               'dates' is longer than 'slept' then it is assumed that
+%               ***It is assumed that 'dates' matches 'sleptCoeffs'. If
+%               'dates' is longer than 'sleptCoeffs' then it is assumed that
 %               these are extra dates that you would like sleptCoeffsSignal
 %               to be evaluated at. This is useful if you want to
 %               interpolate to one of the GRACE missing months that is
@@ -47,7 +47,7 @@
 %               can be included.
 % givenerrors   These are given errors, if you have them. In this case a
 %               weighted inversion is performed. givenerrors should be the
-%               same dimensions of slept.
+%               same dimensions of sleptCoeffs.
 % specialterms  A cell array such as {2 'periodic' 1460}. At the moment
 %               this is pretty specific to our needs, but could be
 %               expanded later.
@@ -101,27 +101,58 @@
 %               matrix from sleptCoeffsResid and then doing the matrix
 %               multiplication with the eigenfunction integrals.
 %
-% Last modified by williameclee-at-arizona.edu  6/07/2024
-% Last modified by charig-at-princeton.edu  6/26/2012
+% Last modified by 
+%   charig-at-princeton.edu  6/26/2012
+%   williameclee-at-arizona.edu  6/07/2024
 
-function varargout = slept2resid(sleptCoeffs, dates, fitwhat, ...
-        givenerrors, specialterms, CC, TH, N)
+function varargout = slept2resid_new(varargin)
 
     %% Initialisation and preallocation
-    defval('xver', 0);
-    %defval('specialterms',{2 'periodic' 1728.1});
-    defval('specialterms', {NaN});
-    defval('slept', ...
-    'grace2slept(''CSR'',''greenland'',0.5,60,[],[],[],[],''SD'')');
-    defval('extravalues', []);
-    defval('givenerrors', ones(size(sleptCoeffs)));
-    defval('fitwhat', [3, 365.0]);
-    defval('P2ftest', 0);
-    defval('P3ftest', 0);
+    sleptCoeffsDefault = 'grace2slept(''CSR'',''greenland'',0.5,60,[],[],[],[],''SD'')';
+    datesDefault = datenum(2004, 1:12, 1); %#ok<DATNM>
+    fitwhatDefault = [3, 365.0];
+    givenerrorsDefault = [];
+    % givenerrorsDefault = ones(size(sleptCoeffs));
+    specialtermsDefault = {NaN};
+    CCDefault = [];
+    THDefault = [];
+    NDefault = [];
+
+    p = inputParser;
+    addOptional(p, 'sleptCoeffs', sleptCoeffsDefault);
+    addOptional(p, 'dates', datesDefault);
+    addOptional(p, 'Fit', fitwhatDefault);
+    addOptional(p, 'givenerrors', givenerrorsDefault);
+    addOptional(p, 'specialterms', specialtermsDefault);
+    addOptional(p, 'CC', CCDefault);
+    addOptional(p, 'TH', THDefault, ...
+        @(x) ischar(x) || isnumeric(x) || iscell(x) || isempty(x));
+    addOptional(p, 'N', NDefault);
+    addOptional(p, 'MoreRegionSpecs', {});
+    parse(p, varargin{:});
+    sleptCoeffs = conddefval(p.Results.sleptCoeffs, sleptCoeffsDefault);
+    dates = conddefval(p.Results.dates, datesDefault);
+    fitwhat = conddefval(p.Results.Fit, fitwhatDefault);
+    givenerrors = conddefval(p.Results.givenerrors, givenerrorsDefault);
+    specialterms = conddefval(p.Results.specialterms, specialtermsDefault);
+    CC = conddefval(p.Results.CC, CCDefault);
+    TH = conddefval(p.Results.TH, THDefault);
+    N = conddefval(p.Results.N, NDefault);
+    moreRegionSpecs = p.Results.MoreRegionSpecs;
+
+    if iscell(TH) && length(TH) > 2
+        moreRegionSpecs = {TH{3:end}, moreRegionSpecs{:}}; %#ok<CCAT>
+    end
+
+    xver = 0;
+    P2ftest = 0;
+    P3ftest = 0;
 
     if ischar(sleptCoeffs)
         % Evaluate the specified expression
         [sleptCoeffs, ~, dates, TH, ~, CC] = eval(sleptCoeffs);
+    else
+        givenerrors = conddefval(givenerrors, ones(size(sleptCoeffs)));
     end
 
     % Dates
@@ -506,95 +537,97 @@ function varargout = slept2resid(sleptCoeffs, dates, fitwhat, ...
 
     end
 
-    %% Return requested output
-    varns = {sleptCoeffsSignal, sleptCoeffsResid, ftests, extravalues};
+    %% Returning requested output
+    varargout = {sleptCoeffsSignal, sleptCoeffsResid, ftests, extravalues};
 
     % Total combined fitting
 
     % If we have the parameters for this localization, and we requested the
     % total fit, then let's do that.
 
-    if nargout >= 5 && exist('CC', 'var') && exist('TH', 'var')
-
-        % Get the residual covariance
-        [Cab] = slepresid2cov(sleptCoeffsResid);
-
-        % Calculate the bandwdith for this basis
-        L = sqrt(size(sleptCoeffs, 2)) - 1;
-        % This should be an integer
-        if (floor(L) ~= L)
-            error('Something fishy about your L');
-        end
-
-        if iscell(TH)
-            % Something like {'greenland' 0.5}
-            XY = eval(sprintf('%s(%i,%f)', TH{1}, 0, TH{2}));
-        else
-            % Coordinates or a string, either works
-            XY = TH;
-        end
-
-        % Calculate the Shannon number for this basis
-        defval('N', round((L + 1) ^ 2 * spharea(XY)));
-
-        % Make the coefficients with reference to some mean
-        % If they already are, then this won't matter
-        sleptdelta = sleptCoeffs(1:nMonth, :) ...
-            - repmat(mean(sleptCoeffs(1:nMonth, :), 1), nMonth, 1);
-
-        % COMBINE
-
-        % We want to take the Slepian functions and combine them to get total mass.
-        % For signal, this means integrating the functions and adding them.  For
-        % the error, this means using the error propogation equation, where we
-        % compute (int)*(covar)*(int)'.  Since the slepcoffs are constants that
-        % just come forward, we can do the integration of the eigenfunctions
-        % first (and once for each function), then multiply by slepcoffs to
-        % get the monthly values.  This is much faster.
-
-        [eigfunINT] = integratebasis(CC, TH, N);
-
-        % Since Int should have units of (fn * m^2), need to go from fractional
-        % sphere area to real area.  If the fn is surface density, this output is
-        % in kilograms.  Then change the units from kg to Gt in METRIC tons
-        eigfunINT = eigfunINT * 4 * pi * 6370000 ^ 2/10 ^ 3/10 ^ 9;
-        functionintegrals = eigfunINT;
-
-        % Now multiply by the appropriate slepcoffs to get the months
-        % This becomes alpha by months
-        %functimeseries=repmat(eigfunINT',1,nmonths).*sleptdelta(:,1:N)';
-        %functimeseries = sleptdelta(:,1:N)';
-
-        % Here do the total sum of the data
-        total = eigfunINT * sleptdelta(:, 1:N)';
-
-        % Get the error
-        thevars = diag(Cab(1:N, 1:N))';
-        alphavar = eigfunINT .^ 2 .* thevars;
-        % Now the combined error with covariance
-        alphavarall = eigfunINT * Cab(1:N, 1:N) * eigfunINT';
-
-        % FITTING
-
-        % We have uniform estimated error, which will be different than the polyfit
-        % estimated residuals because ours account for sinusoidal signals.  So
-        % pass the new error to our function for replacement, so
-        % that the fitting confidence intervals reflect that
-
-        [fit, delta, totalparams, paramerrors] = ...
-            timeseriesfit([dates', total'], alphavarall, 1, 1);
-
-        % Make a matrix for the line, and 95% confidence in the fit
-        totalfit = [dates', fit, delta];
-
-        % Make the error valid for a year
-        totalparamerrors = paramerrors * 365;
-
-        % Collect the expanded output
-        varns = {sleptCoeffsSignal, sleptCoeffsResid, ftests, extravalues, ...
-                     total, alphavarall, totalparams, totalparamerrors, totalfit, ...
-                     functionintegrals, alphavar};
+    if ~(nargout >= 5 && exist('CC', 'var') && exist('TH', 'var'))
+        return
     end
 
-    varargout = varns(1:nargout);
+    % Get the residual covariance
+    [Cab] = slepresid2cov(sleptCoeffsResid);
+
+    % Calculate the bandwdith for this basis
+    L = sqrt(size(sleptCoeffs, 2)) - 1;
+    % This should be an integer
+    if (floor(L) ~= L)
+        error('Something fishy about your L');
+    end
+
+    if iscell(TH)
+        % Something like {'greenland' 0.5}
+        % XY = eval(sprintf('%s(%i,%f)', TH{1}, 0, TH{2}));
+        XY = feval(TH{1}, 0, TH{2}, moreRegionSpecs{:});
+    else
+        % Coordinates or a string, either works
+        XY = TH;
+    end
+
+    % Calculate the Shannon number for this basis
+    defval('N', round((L + 1) ^ 2 * spharea(XY)));
+
+    % Make the coefficients with reference to some mean
+    % If they already are, then this won't matter
+    sleptdelta = sleptCoeffs(1:nMonth, :) ...
+        - repmat(mean(sleptCoeffs(1:nMonth, :), 1), nMonth, 1);
+
+    % COMBINE
+
+    % We want to take the Slepian functions and combine them to get total mass.
+    % For signal, this means integrating the functions and adding them.  For
+    % the error, this means using the error propogation equation, where we
+    % compute (int)*(covar)*(int)'.  Since the slepcoffs are constants that
+    % just come forward, we can do the integration of the eigenfunctions
+    % first (and once for each function), then multiply by slepcoffs to
+    % get the monthly values.  This is much faster.
+
+    [eigfunINT] = integratebasis(CC, TH, N, "MoreRegionSpecs", moreRegionSpecs);
+
+    % Since Int should have units of (fn * m^2), need to go from fractional
+    % sphere area to real area.  If the fn is surface density, this output is
+    % in kilograms.  Then change the units from kg to Gt in METRIC tons
+    eigfunINT = eigfunINT * 4 * pi * 6370000 ^ 2/10 ^ 3/10 ^ 9;
+    functionintegrals = eigfunINT;
+
+    % Now multiply by the appropriate slepcoffs to get the months
+    % This becomes alpha by months
+    %functimeseries=repmat(eigfunINT',1,nmonths).*sleptdelta(:,1:N)';
+    %functimeseries = sleptdelta(:,1:N)';
+
+    % Here do the total sum of the data
+    total = eigfunINT * sleptdelta(:, 1:N)';
+
+    % Get the error
+    thevars = diag(Cab(1:N, 1:N))';
+    alphavar = eigfunINT .^ 2 .* thevars;
+    % Now the combined error with covariance
+    alphavarall = eigfunINT * Cab(1:N, 1:N) * eigfunINT';
+
+    % FITTING
+
+    % We have uniform estimated error, which will be different than the polyfit
+    % estimated residuals because ours account for sinusoidal signals.  So
+    % pass the new error to our function for replacement, so
+    % that the fitting confidence intervals reflect that
+
+    [fit, delta, totalparams, paramerrors] = ...
+        timeseriesfit([dates', total'], alphavarall, 1, 1);
+
+    % Make a matrix for the line, and 95% confidence in the fit
+    totalfit = [dates', fit, delta];
+
+    % Make the error valid for a year
+    totalparamerrors = paramerrors * 365;
+
+    % Collect the expanded output
+    varargout = ...
+        {sleptCoeffsSignal, sleptCoeffsResid, ftests, extravalues, ...
+         total, alphavarall, totalparams, totalparamerrors, totalfit, ...
+         functionintegrals, alphavar};
+
 end
