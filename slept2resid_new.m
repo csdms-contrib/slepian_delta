@@ -101,7 +101,7 @@
 %               matrix from sleptCoeffsResid and then doing the matrix
 %               multiplication with the eigenfunction integrals.
 %
-% Last modified by 
+% Last modified by
 %   charig-at-princeton.edu  6/26/2012
 %   williameclee-at-arizona.edu  6/07/2024
 
@@ -561,8 +561,12 @@ function varargout = slept2resid_new(varargin)
 
     if iscell(TH)
         % Something like {'greenland' 0.5}
-        % XY = eval(sprintf('%s(%i,%f)', TH{1}, 0, TH{2}));
-        XY = feval(TH{1}, 0, TH{2}, moreRegionSpecs{:});
+        if length(TH) >= 3
+            XY = feval(TH{:});
+        else
+            XY = feval(TH{1}, 0, TH{2}, moreRegionSpecs{:});
+        end
+
     else
         % Coordinates or a string, either works
         XY = TH;
@@ -586,7 +590,7 @@ function varargout = slept2resid_new(varargin)
     % first (and once for each function), then multiply by slepcoffs to
     % get the monthly values.  This is much faster.
 
-    [eigfunINT] = integratebasis(CC, TH, N, "MoreRegionSpecs", moreRegionSpecs);
+    eigfunINT = integratebasis_new(CC, TH, N, "MoreRegionSpecs", moreRegionSpecs);
 
     % Since Int should have units of (fn * m^2), need to go from fractional
     % sphere area to real area.  If the fn is surface density, this output is

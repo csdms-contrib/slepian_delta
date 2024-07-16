@@ -104,8 +104,22 @@ function varargout = grace2slept_new(varargin)
         % Get the Slepian basis; definitely not block-sorted as for the rotated
         % versions this will make no sense at all anymore
         moreRegionSpecs = {"Upscale", upscale, moreRegionSpecs{:}}; %#ok<CCAT>
-        [G, V, ~, ~, N] ...
-            = glmalpha_new(region, Lwindow, moreRegionSpecs, 0, 'J', truncation, "BeQuiet", beQuiet);
+
+        if iscell(region)
+
+            if length(region) >= 3
+                [G, V, ~, ~, N] ...
+                    = glmalpha_new(region, Lwindow, 'J', truncation, "BeQuiet", beQuiet);
+            else
+                [G, V, ~, ~, N] ...
+                    = glmalpha_new(region{1}, Lwindow, moreRegionSpecs, 0, 'J', truncation, "BeQuiet", beQuiet);
+            end
+
+        else
+            [G, V, ~, ~, N] ...
+                = glmalpha_new(region, Lwindow, moreRegionSpecs, 0, 'J', truncation, "BeQuiet", beQuiet);
+        end
+
     else
         % Need to get a complete GLMALPHA but for the rotated basis
         % Definitely, "single-order" has lost its meaning here, but the MTAP
@@ -267,10 +281,12 @@ function varargout = parseinputs(vArargin)
     dataproductstring = [dataCentre releaseLevel num2str(Ldata)];
 
     if iscell(region) && length(region) >= 2
+
         if length(region) > 2
             moreRegionSpecs = {region{3:end}, moreRegionSpecs{:}}; %#ok<CCAT>
         end
-        region = region{1};
+
+        % region = region{1};
     end
 
     varargout = ...
@@ -314,10 +330,15 @@ function [outputFilePath, region] = getoutputfile(region, buf, moreRegionSpecs, 
                 case 'geographical'
                     % Here, TH gets passed to glmalpha, and glmalpha will interpret
                     % either the cell of the region
-                    regionString = [region, dataattrchar('Buffer', buf, moreRegionSpecs{:})];
+                    if iscell(region) && length(region) >= 3
+                        regionString = [region{1}, dataattrchar("Buffer", region{3:end})];
+                    else
+                        regionString = [region, dataattrchar('Buffer', buf, moreRegionSpecs{:})];
 
-                    if buf ~= 0
-                        region = {region buf};
+                        if buf ~= 0
+                            region = {region buf};
+                        end
+
                     end
 
                     % else % Closed coordinates (make a hash)
@@ -346,7 +367,7 @@ end
 
 function regionType = regiontype(region)
 
-    if ischar(region) || isstring(region)
+    if ischar(region) || isstring(region) || iscell(region)
         regionType = 'geographical';
     elseif isnumeric(region) && isscalar(region)
         regionType = 'polar';

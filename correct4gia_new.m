@@ -101,7 +101,7 @@
 %    sea-level change and present-day uplift rates. Geophysical Journal
 %    International 190, 1464-1482. doi:10.1111/j.1365-246X.2012.05557.x
 %
-% Last modified by 
+% Last modified by
 %   charig-at-email.arizona.edu on 5/23/2017
 %   williameclee-at-arizona.edu on 7/12/2024
 
@@ -144,7 +144,7 @@ function varargout = correct4gia_new(varargin)
 
     if iscell(TH) && length(TH) > 2
         moreRegionSpecs = {TH{3:end}, moreRegionSpecs{:}}; %#ok<CCAT>
-        TH = TH{1:2};
+        % TH = TH(1:2);
     end
 
     xver = 0;
@@ -193,6 +193,8 @@ function varargout = correct4gia_new(varargin)
 
         if isnumeric(TH)
             [falpha, ~, N, ~, G] = plm2slep_new(lmcosiM, TH, L, phi, theta, omega, "BeQuiet", beQuiet);
+        elseif iscell(TH) && length(TH) >= 3
+            [falpha, ~, N, ~, G] = plm2slep_new(lmcosiM, TH, L, "BeQuiet", beQuiet);
         else
             [falpha, ~, N, ~, G] = plm2slep_new(lmcosiM, TH, L, "MoreRegionSpecs", moreRegionSpecs, "BeQuiet", beQuiet);
         end
@@ -243,7 +245,12 @@ function varargout = correct4gia_new(varargin)
             CC{j} = [lmcosiW(:, 1:2), cosi];
         end
 
-        [eigfunINT] = integratebasis(CC, TH, round(N), "MoreRegionSpecs", moreRegionSpecs);
+        if iscell(TH) && length(TH) >= 3
+            [eigfunINT] = integratebasis_new(CC, TH, round(N));
+        else
+            [eigfunINT] = integratebasis_new(CC, TH, round(N), "MoreRegionSpecs", moreRegionSpecs);
+        end
+
         % Since Int should have units of (fn * m^2), need to go from fractional
         % sphere area to real area.  If the fn is surface density, this output is
         % in kilograms.  Then change the units from kg to Gt in METRIC tons

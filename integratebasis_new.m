@@ -25,6 +25,7 @@
 %
 %
 % Last modified by charig-at-email.arizona.edu, 11/01/2016
+
 function varargout = integratebasis_new(varargin)
     [CC, TH, J, phi, theta, MoreRegionSpecs] = parseinputs(varargin);
 
@@ -99,7 +100,13 @@ function varargout = integratebasis_new(varargin)
                 [latf, lonf] = flatearthpoly(latp, lonp);
                 XY = [lonf, latf];
             else
-                XY = feval(dom, pars, buf, MoreRegionSpecs{:});
+
+                if iscell(TH) && length(TH) >= 3
+                    XY = feval(TH{:});
+                else
+                    XY = feval(dom, pars, buf, MoreRegionSpecs{:});
+                end
+
             end
 
         case 'lonlat'
@@ -150,9 +157,11 @@ function varargout = parseinputs(inputArguments)
     moreRegionSpecs = p.Results.MoreRegionSpecs;
 
     if iscell(TH)
+
         if length(TH) > 2
             moreRegionSpecs = {TH{3:end}, moreRegionSpecs{:}}; %#ok<CCAT>
         end
+
     end
 
     varargout = {CC, TH, J, phi, theta, moreRegionSpecs};

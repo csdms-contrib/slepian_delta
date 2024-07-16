@@ -118,8 +118,8 @@ function varargout = plm2avg(lmcosi, dom)
     % Get the longitudinal integration info for the domain
     defval('Nk', 10);
     % Now we may have multiple pairs
-    phint = dphregion(acos(x) * 180 / pi, Nk, dom);
-    phint = phint * pi / 180;
+    phint = dphregion(acosd(x), Nk, dom);
+    phint = deg2rad(phint);
 
     % No need to initialize miniK since we can make it all at once
     ondex = 0;
