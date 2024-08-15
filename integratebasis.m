@@ -127,9 +127,9 @@ function varargout = integratebasis(CC, TH, J, phi, theta)
             XY = eval(sprintf('%s(%i,%f)', dom, pars, buf));
         end
 
-    elseif isfloat(TH) && length(TH) == 1
+    elseif isfloat(TH) && isscalar(TH)
         % We have Polar caps
-        XY = [[1:360]' repmat(90 - TH, 360, 1)];
+        XY = [(1:360)' repmat(90 - TH, 360, 1)];
         [thetap, phip, ~] = rottp((90 - XY(:, 2)) * pi / 180, XY(:, 1) * pi / 180, 0, -theta * pi / 180, -phi * pi / 180);
         lonp = phip * 180 / pi;
         latp = 90 - thetap * 180 / pi;
@@ -147,7 +147,7 @@ function varargout = integratebasis(CC, TH, J, phi, theta)
 
     % Run parallel is we are able
     parfor h = 1:J
-        [Int, A] = plm2avg(CC{h}, XY);
+        [Int, ~] = plm2avg(CC{h}, XY);
         eigfunINT(h) = Int;
     end
 

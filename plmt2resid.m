@@ -1,49 +1,50 @@
+% [ESTresid,thedates,ESTsignal,rmset,rmsst,varet,varst]
+%             =PLMT2RESID(plmt,thedates,fitwhat,givenerrors)
+%
+% Takes a time series of spherical harmonic coefficients and fits a desired
+% combination of functions (e.g. secular, annual, semiannual, etc.)
+%
+% INPUT:
+%
+% plmt        The time series of spherical harmonic coefficients.  This
+%               should be a three dimensional matrix (not a cell array),
+%               where the first dimension is time, and dimensions 2 and 3
+%               are as in the traditional lmcosi matrix.
+% thedates    An array of dates corresponding to the plm thedateseries.  These
+%               should be in Matlab's date format. (see DATENUM)
+% fitwhat     The functions that you would like to fit to the time series
+%               data.  The format of this array is as follows:
+%               [mean secular periodic1 periodic2 periodic3 etc...] where
+%               - mean is either 0/1 to turn off/on this function
+%               - secular is either 0/1 to turn off/on this function
+%               - periodic1 is the period in days of a function (i.e. 365.0)
+%              Any # of desired periodic functions can be included.
+% givenerrors  These are given errors, if you have them.  In this case a
+%                weighted inversion is performed.  givenerrors should be the
+%                same dimensions of plmt.
+%
+% OUTPUT:
+%
+% ESTresid    Residual time series for each pair of cos/sin coefficients
+%             [nmonths x Ldata x 4] with a hyper-lmcosi format
+%             ESTresid(:,:,1) the degree
+%             ESTresid(:,:,2) the order
+%             ESTresid(:,:,3) the cosine coefficient
+%             ESTresid(:,:,4) the sine coefficient
+% thedates    The dates that belong to these time series
+% ESTsignal   The least-squares fitted function for each cos/sin
+%             coefficient evaluated at those months in the same format
+% rmset       The root mean square of the estimated residual coefficients
+% rmsst       The root mean square of the estimated signal coefficients
+% varet       The variance of the estimated residual coefficients
+% varst       The variance of the estimated signal coefficients
+%
+% SEE ALSO:
+%
+% Last modified by charig-at-princeton.edu 5/29/2023
+% Last modified by fjsimons-at-alum.mit.edu 5/26/2011
+
 function varargout = plmt2resid(plmt, thedates, fitwhat, givenerrors)
-    % [ESTresid,thedates,ESTsignal,rmset,rmsst,varet,varst]
-    %             =PLMT2RESID(plmt,thedates,fitwhat,givenerrors)
-    %
-    % Takes a time series of spherical harmonic coefficients and fits a desired
-    % combination of functions (e.g. secular, annual, semiannual, etc.)
-    %
-    % INPUT:
-    %
-    % plmt        The time series of spherical harmonic coefficients.  This
-    %               should be a three dimensional matrix (not a cell array),
-    %               where the first dimension is time, and dimensions 2 and 3
-    %               are as in the traditional lmcosi matrix.
-    % thedates    An array of dates corresponding to the plm thedateseries.  These
-    %               should be in Matlab's date format. (see DATENUM)
-    % fitwhat     The functions that you would like to fit to the time series
-    %               data.  The format of this array is as follows:
-    %               [mean secular periodic1 periodic2 periodic3 etc...] where
-    %               - mean is either 0/1 to turn off/on this function
-    %               - secular is either 0/1 to turn off/on this function
-    %               - periodic1 is the period in days of a function (i.e. 365.0)
-    %              Any # of desired periodic functions can be included.
-    % givenerrors  These are given errors, if you have them.  In this case a
-    %                weighted inversion is performed.  givenerrors should be the
-    %                same dimensions of plmt.
-    %
-    % OUTPUT:
-    %
-    % ESTresid    Residual time series for each pair of cos/sin coefficients
-    %             [nmonths x Ldata x 4] with a hyper-lmcosi format
-    %             ESTresid(:,:,1) the degree
-    %             ESTresid(:,:,2) the order
-    %             ESTresid(:,:,3) the cosine coefficient
-    %             ESTresid(:,:,4) the sine coefficient
-    % thedates    The dates that belong to these time series
-    % ESTsignal   The least-squares fitted function for each cos/sin
-    %             coefficient evaluated at those months in the same format
-    % rmset       The root mean square of the estimated residual coefficients
-    % rmsst       The root mean square of the estimated signal coefficients
-    % varet       The variance of the estimated residual coefficients
-    % varst       The variance of the estimated signal coefficients
-    %
-    % SEE ALSO:
-    %
-    % Last modified by charig-at-princeton.edu 5/29/2023
-    % Last modified by fjsimons-at-alum.mit.edu 5/26/2011
 
     defval('xver', 0)
     defval('plmt', fullfile(getenv('IFILES'), 'GRACE', 'CSR_RL06_alldata_60_SD.mat'))
@@ -75,7 +76,7 @@ function varargout = plmt2resid(plmt, thedates, fitwhat, givenerrors)
     %x0 = datenum(bounds(1)  ,1,1);
     %x1 = datenum(bounds(2)+1,1,1);
 
-    [i, j, k] = size(plmt);
+    j = size(plmt, 2);
 
     % Initialize the residuals
     ESTresid = zeros(size(plmt));
@@ -437,4 +438,4 @@ function varargout = plmt2resid(plmt, thedates, fitwhat, givenerrors)
     % Collect output
     varns = {ESTresid, thedates, ESTsignal, rmset, rmsst, varet, varst};
     varargout = varns(1:nargout);
-  end
+end
