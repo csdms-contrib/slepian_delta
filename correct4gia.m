@@ -13,23 +13,31 @@ function varargout=correct4gia(thedates,model,TH,L,phi,theta,omega)
 %
 % INPUT:
 %
-% thedates     An array of dates in matlab DATENUM format.  The first date
-%                is used as the reference date. [default: monthly points 
-%                during 2004]
-% model        Which GIA model you want.  See references. Options include:
-%                'Paulson07'    A model based on the ICE-5G ice load model
-%                               of Peltier (2004).  Suitable for both 
-%                               Antarctica and Greenland.  As corrected by 
-%                               Geruo A and J. Wahr.  Global.
-%                'Wangetal08'   A model based on the older ICE-4G ice 
-%                               model, and viscosity which varies
-%                               laterally.  Suitable for Greenland.
-%                'IJ05_R2'      A model based on the Ivins et al. (2013) 
-%                               ice model.  Suitable for Antarctica.
-%                'IJ05'         A model based on the Ivins and James (2005) 
-%                               ice model.  Suitable for Antarctica.
-%                'W12a_v1'      A "best" model from Whitehouse et al (2012)
-%                               Suitable only for Antarctica.
+% thedates    An array of dates in matlab DATENUM format.  The first date
+%               is used as the reference date. [default: monthly points 
+%               during 2004]
+% model     Which GIA model you want.  See references. Options include:
+%
+%              'Steffen_ice6g_vm5a'   A model computed by H. Steffen using
+%                                     the ice6g ice model and vm5a viscosity 
+%                                     profile. Other models from this 
+%                                     dataset are also available and use 
+%                                     the original naming scheme. For
+%                                     example, 'Steffen_anu-ice_i72'.
+%
+%              'Paulson07'    A model based on the ICE-5G ice load model
+%                             of Peltier (2004).  Suitable for both 
+%                             Antarctica and Greenland.  As corrected by 
+%                             Geruo A and J. Wahr.  Global.
+%              'Wangetal08'   A model based on the older ICE-4G ice 
+%                             model, and viscosity which varies
+%                             laterally.  Suitable for Greenland.
+%              'IJ05_R2'      A model based on the Ivins et al. (2013) 
+%                             ice model.  Suitable for Antarctica.
+%              'IJ05'         A model based on the Ivins and James (2005) 
+%                             ice model.  Suitable for Antarctica.
+%              'W12a_v1'      A "best" model from Whitehouse et al (2012)
+%                             Suitable only for Antarctica.
 %
 % TH         Optional [default nothing]:Radius of the concentration 
 %              region (degrees) OR
@@ -124,9 +132,11 @@ defval('xver',0)
 
 % Where the model save files are kept
 if strncmp(model,'Morrow',6)
-defval('ddir1',fullfile(getenv('IFILES'),'GIA',model(1:6)));
+    defval('ddir1',fullfile(getenv('IFILES'),'GIA',model(1:6)));
+elseif strncmp(model,'Steffen',7)
+    defval('ddir1',fullfile(getenv('IFILES'),'GIA','SteffenGrids'));
 else
-defval('ddir1',fullfile(getenv('IFILES'),'GIA',model));
+    defval('ddir1',fullfile(getenv('IFILES'),'GIA',model));
 end
 % And the appropriate name
 fnpl=sprintf('%s/%s_SD.mat',ddir1,model);
