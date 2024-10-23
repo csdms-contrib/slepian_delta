@@ -40,7 +40,8 @@
 %                  mean/linear/quadratic/cubic function (if increasing
 %                  the power of the function reduces variance enough)
 %               - periodic1 is the period in days of a function (i.e. 365.0)
-%              Any # of desired periodic functions [days] can be included.
+%              Any # of desired periodic functions [days] can be included. If
+%              you don't want any periodic functions, input a scalar.
 % givenerrors  These are given errors, if you have them.  In this case a
 %                weighted inversion is performed.  givenerrors should be the
 %                same dimensions of slept.
@@ -101,7 +102,7 @@
 %
 % SEE ALSO:
 %
-% Last modified by 
+% Last modified by
 %   williameclee-at-arizona.edu  10/23/2024
 %   charig-at-princeton.edu  6/26/2012
 function varargout = slept2resid(slept, thedates, fitwhat, givenerrors, specialterms, CC, TH, N)
@@ -145,15 +146,23 @@ function varargout = slept2resid(slept, thedates, fitwhat, givenerrors, specialt
     xprime = (thedates - mu1) / mu2;
     extradatesprime = (extradates - mu1) / mu2;
 
-    % The frequencies being fitted in [1/days]
-    omega = 1 ./ [fitwhat(2:end)];
-    % Rescale these to our new xprime
-    omega = omega * mu2;
     J = size(slept, 2);
     % Initialize the residuals
     ESTresid = zeros(size(slept));
     % Initialize the evaluated fitted function set
     ESTsignal = zeros(size(slept));
+
+    % The frequencies being fitted in [1/days]
+    if isscalar(fitwhat)
+        % If we just have a scalar, then we are fitting a mean
+        omega = [];
+    else
+        % If we have a vector, then we are fitting periodic functions
+        omega = 1 ./ [fitwhat(2:end)];
+        % Rescale these to our new xprime
+        omega = omega * mu2;
+    end
+
     % Figure out the orders and degrees of this setup
     % BUT orders and degrees have lost their meaning since slept should
     % be ordered by eigenvalue
@@ -200,7 +209,9 @@ function varargout = slept2resid(slept, thedates, fitwhat, givenerrors, specialt
     omegaspec = [];
     thspec = [];
 
-    if ~isempty(omega)
+    if isempty(omega)
+        th_o = [];
+    else
         % Angular frequency in radians/(rescaled day) of the periodic terms
         th_o = repmat(omega, nmonths, 1) * 2 * pi .* repmat((xprime)', 1, lomega);
         G1 = [G1 cos(th_o) sin(th_o)];
@@ -394,8 +405,10 @@ function [signal, resid, extravalues, ftests] = ...
     signal = mL2_1(1) + mL2_1(2) * (xprime);
 
     % Add the sum over all the periodic components periodics
-    signal = signal + ...
-        sum(repmat(amp1, 1, nmonths) .* sin(th' + repmat(phase1, 1, nmonths)), 1);
+    if lomega >= 1
+        signal = signal + ...
+            sum(repmat(amp1, 1, nmonths) .* sin(th' + repmat(phase1, 1, nmonths)), 1);
+    end
 
     % Compute the residual time series for this coefficient
     resid = d - signal';
@@ -430,8 +443,10 @@ function [signal, resid, extravalues, ftests] = ...
 
         signal = mL2_2(1) + mL2_2(2) * (xprime) + mL2_2(3) * (xprime) .^ 2;
 
-        signal = signal + ...
-            sum(repmat(amp2, 1, nmonths) .* sin(th' + repmat(phase2, 1, nmonths)), 1);
+        if lomega >= 1
+            signal = signal + ...
+                sum(repmat(amp2, 1, nmonths) .* sin(th' + repmat(phase2, 1, nmonths)), 1);
+        end
 
         % Compute the residual time series for this coefficient
         resid = d - signal';
@@ -478,8 +493,10 @@ function [signal, resid, extravalues, ftests] = ...
         signal = mL2_3(1) + mL2_3(2) * (xprime) ...
             + mL2_3(3) * (xprime) .^ 2 + mL2_3(4) * (xprime) .^ 3;
 
-        signal = signal + ...
-            sum(repmat(amp3, 1, nmonths) .* sin(th' + repmat(phase3, 1, nmonths)), 1);
+        if lomega >= 1
+            signal = signal + ...
+                sum(repmat(amp3, 1, nmonths) .* sin(th' + repmat(phase3, 1, nmonths)), 1);
+        end
 
         resid = d - signal';
 
