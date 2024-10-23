@@ -105,8 +105,11 @@
 % Last modified by
 %   williameclee-at-arizona.edu  10/23/2024
 %   charig-at-princeton.edu  6/26/2012
-function varargout = slept2resid(slept, thedates, fitwhat, givenerrors, specialterms, CC, TH, N)
+
+function varargout = slept2resid(varargin)
     %% Initialisation
+    [slept, thedates, fitwhat, givenerrors, specialterms, CC, TH, N, xver, runParallel] = ...
+        parseinputs(varargin{:});
     defval('xver', 0);
     defval('specialterms', {NaN});
     defval('slept', 'grace2slept({''CSR'', ''RL06'', 60},''greenland'',0.5,60,[],[],[],[],''SD'')');
@@ -237,9 +240,9 @@ function varargout = slept2resid(slept, thedates, fitwhat, givenerrors, specialt
     % different weighting matrix.  Thus we loop over the coefficients.
     extravalues = zeros([length(moredates), J]);
     ftests = zeros([J, 3]);
-    xver = xver; %#ok<NODEF,ASGSL> Just to make sure the parfor knows about it
 
-    if license('test', 'Distrib_Computing_Toolbox') % Check for the Parallel Computing Toolbox
+    if license('test', 'Distrib_Computing_Toolbox') && ... % Check for the Parallel Computing Toolbox
+            runParallel
 
         parfor index = 1:J
             isSpecial = index == specialterms{1};
@@ -247,7 +250,7 @@ function varargout = slept2resid(slept, thedates, fitwhat, givenerrors, specialt
                 fitindividualcoeff(slept(:, index), givenerrors(:, index), xprime, fitwhat, nmonths, moredates, extradatesprime, ...
                 {G1, G2, G3}, {omega, th_o}, ...
                 isSpecial, {Gspec1, Gspec2, Gspec3}, {omegaspec, thspec}, ...
-                {xver, index});
+                {xver, index, thedates});
         end
 
     else
@@ -258,7 +261,7 @@ function varargout = slept2resid(slept, thedates, fitwhat, givenerrors, specialt
                 fitindividualcoeff(slept(:, index), givenerrors(:, index), xprime, fitwhat, nmonths, moredates, ...
                 {G1, G2, G3}, {omega, th_o}, ...
                 isSpecial, {Gspec1, Gspec2, Gspec3}, {omegaspec, thspec}, ...
-                {xver, index});
+                {xver, index, thedates});
         end
 
     end
@@ -274,7 +277,7 @@ function varargout = slept2resid(slept, thedates, fitwhat, givenerrors, specialt
     % If we have the parameters for this localization, and we requested the
     % total fit, then let's do that.
 
-    if ~(nargout >= 5 && exist('CC', 'var') && exist('TH', 'var'))
+    if nargout <= 4
         return
     end
 
@@ -294,6 +297,16 @@ function varargout = slept2resid(slept, thedates, fitwhat, givenerrors, specialt
     else
         % Coordinates or a string, either works
         XY = TH;
+    end
+
+    if ~exist('CC', 'var')
+
+        if iscell(TH)
+            CC = glmalpha(TH, L);
+        else
+            CC = glmalpha(XY, L);
+        end
+
     end
 
     % Calculate the Shannon number for this basis
@@ -349,7 +362,7 @@ end
 
 %% Subfunctions
 function [signal, resid, extravalues, ftests] = ...
-        fitindividualcoeff(slept, givenerrors, xprime, fitwhat, nmonths, moredates, extradatesprime, ...
+        fitindividualcoeff(slept, givenerrors, x, fitwhat, nmonths, hasMoreDates, extrax, ...
         Gs, phases, isSpecial, Gspecs, phasespecs, plotspecs)
     % If we have a priori error information, create a weighting matrix, and
     % change the G and d matrices to reflect this.  Since each coefficient
@@ -362,7 +375,7 @@ function [signal, resid, extravalues, ftests] = ...
     G3w = W * G3;
     dw = W * d;
 
-    extravalues = zeros([length(moredates), 1]);
+    extravalues = zeros([length(hasMoreDates), 1]);
 
     % This is in case you request a single special term to be looked at
     % in a special way
@@ -402,7 +415,7 @@ function [signal, resid, extravalues, ftests] = ...
 
     % Assemble the estimated signal function, evaluated at 'thedates'
     % Start adding things
-    signal = mL2_1(1) + mL2_1(2) * (xprime);
+    signal = mL2_1(1) + mL2_1(2) * (x);
 
     % Add the sum over all the periodic components periodics
     if lomega >= 1
@@ -414,11 +427,11 @@ function [signal, resid, extravalues, ftests] = ...
     resid = d - signal';
 
     % Do extra dates if you have them
-    if moredates
-        th_extras = repmat(myomega, length(extradatesprime), 1) ...
-            * 2 * pi .* repmat((extradatesprime)', 1, lomega);
+    if hasMoreDates
+        th_extras = repmat(myomega, length(extrax), 1) ...
+            * 2 * pi .* repmat((extrax)', 1, lomega);
         % Evaluate at the missing dates
-        extravalues = mL2_1(1) + mL2_1(2) * (extradatesprime) + ...
+        extravalues = mL2_1(1) + mL2_1(2) * (extrax) + ...
             sum(repmat(amp1, 1, 1) .* sin(th_extras' + repmat(phase1, 1, 1)), 1);
     end
 
@@ -441,7 +454,7 @@ function [signal, resid, extravalues, ftests] = ...
         phase2 = [mL2_2(startP:(startP + lomega - 1)) mL2_2((startP + lomega):end)];
         phase2 = atan2(phase2(:, 1), phase2(:, 2));
 
-        signal = mL2_2(1) + mL2_2(2) * (xprime) + mL2_2(3) * (xprime) .^ 2;
+        signal = mL2_2(1) + mL2_2(2) * (x) + mL2_2(3) * (x) .^ 2;
 
         if lomega >= 1
             signal = signal + ...
@@ -452,11 +465,11 @@ function [signal, resid, extravalues, ftests] = ...
         resid = d - signal';
 
         % Do extra dates if you have them
-        if moredates
-            th_extras = repmat(myomega, length(extradatesprime), 1) ...
-                * 2 * pi .* repmat((extradatesprime)', 1, lomega);
-            extravalues = mL2_2(1) + mL2_2(2) * (extradatesprime) + ...
-                mL2_2(3) * (extradatesprime) .^ 2 + ...
+        if hasMoreDates
+            th_extras = repmat(myomega, length(extrax), 1) ...
+                * 2 * pi .* repmat((extrax)', 1, lomega);
+            extravalues = mL2_2(1) + mL2_2(2) * (extrax) + ...
+                mL2_2(3) * (extrax) .^ 2 + ...
                 sum(repmat(amp1, 1, 1) .* sin(th_extras' + repmat(phase1, 1, 1)), 1);
         end
 
@@ -490,8 +503,8 @@ function [signal, resid, extravalues, ftests] = ...
         phase3 = [mL2_3(startP:(startP + lomega - 1)) mL2_3((startP + lomega):end)];
         phase3 = atan2(phase3(:, 1), phase3(:, 2));
 
-        signal = mL2_3(1) + mL2_3(2) * (xprime) ...
-            + mL2_3(3) * (xprime) .^ 2 + mL2_3(4) * (xprime) .^ 3;
+        signal = mL2_3(1) + mL2_3(2) * (x) ...
+            + mL2_3(3) * (x) .^ 2 + mL2_3(4) * (x) .^ 3;
 
         if lomega >= 1
             signal = signal + ...
@@ -501,11 +514,11 @@ function [signal, resid, extravalues, ftests] = ...
         resid = d - signal';
 
         % Do extra dates if you have them
-        if moredates
-            th_extras = repmat(myomega, length(extradatesprime), 1) ...
-                * 2 * pi .* repmat((extradatesprime)', 1, lomega);
-            extravalues = mL2_3(1) + mL2_3(2) * (extradatesprime) + ...
-                mL2_3(3) * (extradatesprime) .^ 2 + mL2_3(4) * (extradatesprime) .^ 3 + ...
+        if hasMoreDates
+            th_extras = repmat(myomega, length(extrax), 1) ...
+                * 2 * pi .* repmat((extrax)', 1, lomega);
+            extravalues = mL2_3(1) + mL2_3(2) * (extrax) + ...
+                mL2_3(3) * (extrax) .^ 2 + mL2_3(4) * (extrax) .^ 3 + ...
                 sum(repmat(amp1, 1, 1) .* sin(th_extras' + repmat(phase1, 1, 1)), 1);
         end
 
@@ -524,9 +537,9 @@ function [signal, resid, extravalues, ftests] = ...
     end
 
     % Some extra plotting for excessive verification
-    [xver, index] = plotspecs{:};
+    [xver, index, thedates] = plotspecs{:};
 
-    if xver == 1 && index <= 30
+    if xver && index <= 30
         clf
         plot(thedates, d, 'b-')
         hold on
@@ -538,4 +551,41 @@ function [signal, resid, extravalues, ftests] = ...
 
     % Make the matrix ftests
     ftests = [0 P2ftest P3ftest];
+end
+
+function varargout = parseinputs(varargin)
+    ip = inputParser;
+    addOptional(ip, 'slept', [], @(x) (isnumeric(x) && ismatrix(x)) || isempty(x));
+    addOptional(ip, 'thedates', [], @(x) ((isnumeric(x) || isdatetime(x)) && isvector(x)) || isempty(x));
+    addOptional(ip, 'fitwhat', [], @(x) (isnumeric(x) || iscell(x)) || isempty(x));
+    addOptional(ip, 'givenerrors', [], @(x) isnumeric(x) || isempty(x));
+    addOptional(ip, 'specialterms', [], @(x) iscell(x) || isempty(x));
+    addOptional(ip, 'CC', [], @(x) (iscell(x) || (isnumeric(x) && ismatrix(x))) || isempty(x));
+    addOptional(ip, 'TH', [], @(x) ischar(x) || iscell(x) || (isnumeric(x) && size(x, 2) == 2) || isempty(x));
+    addOptional(ip, 'N', [], @(x) isnumeric(x) || isempty(x));
+    addParameter(ip, 'xver', [], @(x) isnumeric(x) || isempty(x));
+    addParameter(ip, 'Parallel', true, @(x) isnumeric(x) || islogical(x));
+    parse(ip, varargin{:});
+
+    slept = ip.Results.slept;
+    thedates = ip.Results.thedates;
+    fitwhat = ip.Results.fitwhat;
+    givenerrors = ip.Results.givenerrors;
+    specialterms = ip.Results.specialterms;
+    CC = ip.Results.CC;
+    TH = ip.Results.TH;
+    N = ip.Results.N;
+    xver = ip.Results.xver;
+    runParallel = logical(ip.Results.Parallel);
+
+    if isdatetime(thedates)
+        thedates = days(thedates - thedates(1));
+    end
+
+    if iscell(fitwhat) && length(fitwhat) == 2
+        fitwhat{2} = days(fitwhat{2});
+        fitwhat = [fitwhat{1}, fitwhat{2}];
+    end
+
+    varargout = {slept, thedates, fitwhat, givenerrors, specialterms, CC, TH, N, xver, runParallel};
 end
