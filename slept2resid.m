@@ -16,89 +16,95 @@
 % localization, then we assume that you want the fitting to the integrated
 % functions. i.e. If you have surface density, then using the integrated
 % Slepian function would give you total mass change in a region.  In
-% addition, there will be a fitting of the combination (total) of the Slepian
-% functions up to the Shannon number for this localization.
+% addition, there will be a fitting of the combination (total) of the 
+% Slepian functions up to the Shannon number for this localization.
 %
 % INPUT:
 %
-% slept       The time series of Slepian coefficients.  This
+% slept         The time series of Slepian coefficients.  This
 %               should be a two dimensional matrix (not a cell array),
 %               where the first dimension is time, and the second dimension
 %               are Slepian coefficients sorted by global eigenvalue.
-% thedates    An array of dates corresponding to the slept timeseries.  These
-%               should be in Matlab's date format. (see DATENUM in units
-%               of decimal days)
-%             ***It is assumed that 'thedates' matches 'slept'.  If 'thedates'
-%              is longer than 'slept' then it is assumed that these are
-%              extra dates that you would like ESTsignal to be evaluated at.
-%              This is useful if you want to interpolate to one of the
-%              GRACE missing months that is important, such as Jan 2011.
-% fitwhat     The functions that you would like to fit to the time series
+% thedates      An array of dates corresponding to the slept timeseries.  
+%               These should be in Matlab's datenum or datetime format. 
+%               (see DATENUM in units of decimal days)
+%               ***It is assumed that 'thedates' matches 'slept'.  If 
+%               'thedates' is longer than 'slept' then it is assumed that 
+%               these are extra dates that you would like ESTsignal to be 
+%               evaluated at.
+%               This is useful if you want to interpolate to one of the
+%               GRACE missing months that is important, such as Jan 2011.
+% fitwhat       The functions that you would like to fit to the time series
 %               data.  The format of this array is as follows:
 %               [order periodic1 periodic2 periodic3 etc...] where
 %               - order is either 0/1/2/3 to fit UP TO either a
 %                  mean/linear/quadratic/cubic function (if increasing
 %                  the power of the function reduces variance enough)
-%               - periodic1 is the period in days of a function (i.e. 365.0)
-%              Any # of desired periodic functions [days] can be included. If
-%              you don't want any periodic functions, input a scalar.
-% givenerrors  These are given errors, if you have them.  In this case a
-%                weighted inversion is performed.  givenerrors should be the
-%                same dimensions of slept.
+%               - periodic1 is the period in days of a function
+%               Any # of desired periodic functions [days] can be included. 
+%               If you don't want any periodic functions, input a scalar.
+% givenerrors   These are given errors, if you have them.  In this case a
+%               weighted inversion is performed.  givenerrors should be the
+%               same dimensions of slept.
 % specialterms  A cell array such as {2 'periodic' 1460}.  At the moment
-%                this is pretty specific to our needs, but could be
-%                expanded later.
-% CC           A cell array of the localization Slepian functions
-% TH           The region (proper string or XY coordinates) that you did the
-%               localization on (so we can integrate)
-% N          Number of largest eigenfunctions in which to expand.  By default
-%             rounds to the Shannon number.
+%               this is pretty specific to our needs, but could be
+%               expanded later.
+% CC            A cell array of the localization Slepian functions
+% TH            The region (proper string or XY coordinates) that you did 
+%               the localization on (so we can integrate)
+% N             Number of largest eigenfunctions in which to expand.  By 
+%               default rounds to the Shannon number.
+% xver          If you want to verify the fit of a specific coefficient, 
+%               set this to 1.  This will plot the fit of that coefficient.
+% Parallel      If you have the Parallel Computing Toolbox, you can set 
+%               this to true to speed up the fitting.  If you don't have 
+%               it, then this will be ignored.
 %
 % OUTPUT:
 %
-% ESTsignal   The least-squares fitted function for each Slepian
-%             coefficient evaluated at those months in the same format
-% ESTresid    Residual time series for each Slepian coefficients, ordered
-%              as they were given, presumably by eigenvalue
-%              [nmonths x (Lwindow+1)^2]
-% ftests       A matrix, such as [0 1 1] for each Slepian coefficient,
-%                 on whether the fits you
-%                 requested passed an F-test for significance.
-% extravalues  These are the values of ESTsignal evaluated at your extra
-%                 dates which were tacked onto 'thedates'
-% total        The time series of the combined mass change from N Slepian
-%                functions (i.e. the combined data points)
-% alphavarall  The time averaged variance on each data point (from error
-%                propogation from each individual function).  These values
-%                are the same for every point.
+% ESTsignal     The least-squares fitted function for each Slepian
+%               coefficient evaluated at those months in the same format
+% ESTresid      Residual time series for each Slepian coefficients, ordered
+%               as they were given, presumably by eigenvalue
+%               [nmonths x (Lwindow+1)^2]
+% ftests        A matrix, such as [0 1 1] for each Slepian coefficient,
+%               on whether the fits you
+%               requested passed an F-test for significance.
+% extravalues   These are the values of ESTsignal evaluated at your extra
+%               dates which were tacked onto 'thedates'
+% total         The time series of the combined mass change from N Slepian
+%               functions (i.e. the combined data points)
+% alphavarall   The time averaged variance on each data point (from error
+%               propogation from each individual function).  These values
+%               are the same for every point.
 %
 % totalparams   The parameters of the fits to the total.  This is a 4-by-j
-%                 matrix where j are the fits you wanted.  Zeros fill out
-%                 the unused parameters.  For example, if
-%                 you want just a 2nd order polynomial, you will get
-%                 [intercept intercept; slope slope; 0 quadratic; 0 0]
-% totalparamerrors      The 95% confidence value on this slope.  This is computed
-%               using the critical value for a t-distribution
+%               matrix where j are the fits you wanted.  Zeros fill out
+%               the unused parameters.  For example, if
+%               you want just a 2nd order polynomial, you will get
+%               [intercept intercept; slope slope; 0 quadratic; 0 0]
+% totalparamerrors  The 95% confidence value on this slope.  This is 
+%               computed using the critical value for a t-distribution
 %               At the moment, totalparams and totalparamerrors and just
 %               the values for a linear fit.  Sometime later maybe change
 %               this to be potentially a quadratic fit as well.
 %
-% totalfit       Datapoints for the best fit line, so you can plot it, and
-%                 datapoints for the confidence intervals of this linear fit,
-%                 so you can plot them.  NOTE: To plot these you should use
-%                 totalfit(:,2)+totalfit(:,3) and totalfit(:,2)-totalfit(:,3)
+% totalfit      Datapoints for the best fit line, so you can plot it, and
+%               datapoints for the confidence intervals of this linear fit,
+%               so you can plot them.  NOTE: To plot these you should use
+%               totalfit(:,2)+totalfit(:,3) and totalfit(:,2)-totalfit(:,3)
 %
-% functionintegrals   This is a vector of the integrals of the Slepian
-%                      functions, up to the Shannon number.  With this we
-%                      can multiply by the data or ESTSignal to get the
-%                      changes in total mass over time for each function.
-%                      This also has the conversion from kg to Gt already
-%                      in it, so don't do that again.
+% functionintegrals This is a vector of the integrals of the Slepian
+%               functions, up to the Shannon number.  With this we
+%               can multiply by the data or ESTSignal to get the
+%               changes in total mass over time for each function.
+%               This also has the conversion from kg to Gt already
+%               in it, so don't do that again.
 %
-% alphavar    The variances on the individual alpha function time series (INTEGRALS).
-%              This is calculated by making a covariance matrix from
-%              ESTresid and then doing the matrix multiplication with the
-%              eigenfunction integrals.
+% alphavar      The variances on the individual alpha function time series 
+%               (INTEGRALS). This is calculated by making a covariance 
+%               matrix from ESTresid and then doing the matrix 
+%               multiplication with the eigenfunction integrals.
 %
 % SEE ALSO:
 %
