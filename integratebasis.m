@@ -27,7 +27,7 @@
 % SEE ALSO: PLM2AVG, PLM2AVGP
 %
 % Last modified by
-%   williameclee-at-arizona.edu, 10/23/2024
+%   williameclee-at-arizona.edu, 10/31/2024
 %   charig-at-email.arizona.edu, 11/01/2016
 
 function eigfunINT = integratebasis(varargin)
@@ -147,7 +147,7 @@ function eigfunINT = integratebasis(varargin)
     % Initilization complete
 
     %% Find if we have saved data
-    [dataPath, hasDataSaved] = datapath(TH, J);
+    [dataPath, hasDataSaved] = datapath(TH, J, phi, theta);
 
     if hasDataSaved
         load(dataPath, 'eigfunINT');
@@ -188,9 +188,9 @@ function varargout = parseinputs(varargin)
     varargout = {CC, TH, J, phi, theta, saveData};
 end
 
-function [dataPath, hasDataSaved] = datapath(TH, J)
+function [dataPath, hasDataSaved] = datapath(TH, J, phi, theta)
 
-    if ~ismember(class(TH), {'cell', 'string', 'char'})
+    if ~ismember(class(TH), {'cell', 'string', 'char'}) || (isempty(phi) || isempty(theta))
         dataPath = false;
         hasDataSaved = false;
         return
@@ -205,13 +205,13 @@ function [dataPath, hasDataSaved] = datapath(TH, J)
 
     if iscell(TH) && TH{2} ~= 0
         dataFile = sprintf('EIGFUNINT-%s-%f-%d.mat', TH{1}, TH{2}, J);
-    else
-
-        if iscell(TH)
-            TH = TH{1};
-        end
-
+    elseif iscell(TH)
+        TH = TH{1};
         dataFile = sprintf('EIGFUNINT-%s-%d.mat', TH, J);
+    elseif ischar(TH) || isstring(TH)
+        dataFile = sprintf('EIGFUNINT-%s-%d.mat', TH, J);
+    elseif isnumeric(TH)
+        dataFile = sprintf('EIGFUNINT-%f-%f%f-%d.mat', TH, phi, theta, J);
     end
 
     dataPath = fullfile(dataFolder, dataFile);
