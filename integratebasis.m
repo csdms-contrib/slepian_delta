@@ -17,6 +17,7 @@
 % theta     Colatitude of the center (degrees)
 %           Note: there is no omega here because a rotation of the
 %           polar cap functions does not affect their integration
+% ForceNew  Force the function to recalculate the integrals [DEFAULT: false]
 % SaveData  Save the data to a file [DEFAULT: true]
 %
 % OUTPUT:
@@ -31,7 +32,7 @@
 %   charig-at-email.arizona.edu, 11/01/2016
 
 function eigfunINT = integratebasis(varargin)
-    [CC, TH, J, phi, theta, saveData] = parseinputs(varargin{:});
+    [CC, TH, J, phi, theta, forceNew, saveData] = parseinputs(varargin{:});
     defval('TH', 'africa')
     defval('CC', '[~,CC]=localization(15,TH);');
     defval('phi', 0)
@@ -149,7 +150,7 @@ function eigfunINT = integratebasis(varargin)
     %% Find if we have saved data
     [dataPath, hasDataSaved] = datapath(TH, J, phi, theta);
 
-    if hasDataSaved
+    if hasDataSaved && ~forceNew
         load(dataPath, 'eigfunINT');
         fprintf('%s loaded %s\n', upper(mfilename), dataPath);
         return
@@ -177,6 +178,7 @@ function varargout = parseinputs(varargin)
     addOptional(ip, 'J', [], @(x) isnumeric(x) || isempty(x));
     addOptional(ip, 'phi', [], @(x) isnumeric(x) || isempty(x));
     addOptional(ip, 'theta', [], @(x) isnumeric(x) || isempty(x));
+    addParameter(ip, "ForceNew", false, @(x) islogical(x) || isnumeric(x));
     addParameter(ip, "SaveData", true, @(x) islogical(x) || isnumeric(x));
     parse(ip, varargin{:});
     CC = ip.Results.CC;
@@ -184,8 +186,9 @@ function varargout = parseinputs(varargin)
     J = ip.Results.J;
     phi = ip.Results.phi;
     theta = ip.Results.theta;
+    forceNew = ip.Results.ForceNew;
     saveData = ip.Results.SaveData;
-    varargout = {CC, TH, J, phi, theta, saveData};
+    varargout = {CC, TH, J, phi, theta, forceNew, saveData};
 end
 
 function [dataPath, hasDataSaved] = datapath(TH, J, phi, theta)
