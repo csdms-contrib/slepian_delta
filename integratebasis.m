@@ -190,7 +190,7 @@ end
 
 function [dataPath, hasDataSaved] = datapath(TH, J, phi, theta)
 
-    if ~ismember(class(TH), {'cell', 'string', 'char'}) || (isempty(phi) || isempty(theta))
+    if ~ismember(class(TH), {'cell', 'string', 'char'}) || (isnumeric(TH) && ~isscalar(TH))
         dataPath = false;
         hasDataSaved = false;
         return
