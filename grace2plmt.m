@@ -59,7 +59,7 @@ function varargout=grace2plmt(Pcenter,Rlevel,Ldata,units,forcenew)
 % EXAMPLE: to make a new save file when you have added more months
 % [potcoffs,thedates]=grace2plmt('CSR','RL06',60,'SD',1);
 %
-% Last modified by charig-at-email.arizona.edu, 5/18/2022
+% Last modified by charig-at-email.arizona.edu, 1/12/2025
 % Last modified by lashokkumar-at-arizona.edu, 11/09/2020
 % Last modified by mlubeck-at-email.arizona.edu, 03/18/2019
 % Last modified by fjsimons-at-alum.mit.edu, 05/17/2011
@@ -128,10 +128,11 @@ elseif  strcmp(Pcenter,'CSR')
     elseif strcmp(Rlevel,'RL06')
        % 5/12/2022 GR-FO only now version 6.1
        % 11/12/2023 GR-FO only now version 6.2
+       % 1/12/2025 GR-FO only now version 6.3
        if Ldata == 60
-           datanames=[ls2cell(fullfile(ddir1,'GSM*BA01_0600')) ls2cell(fullfile(ddir1,'GSM*BA01_0602'))];
+           datanames=[ls2cell(fullfile(ddir1,'GSM*GRAC*BA01_0600')) ls2cell(fullfile(ddir1,'GSM*GRFO*BA01_0603'))];
        elseif Ldata == 96
-           datanames=[ls2cell(fullfile(ddir1,'GSM*BB01_0600')) ls2cell(fullfile(ddir1,'GSM*BB01_0602'))];
+           datanames=[ls2cell(fullfile(ddir1,'GSM*GRAC*BB01_0600')) ls2cell(fullfile(ddir1,'GSM*GRFO*BB01_0603'))];
        else
            error(['Solutions with requested L=' num2str(Ldata) ' not currently stored']);
        end
