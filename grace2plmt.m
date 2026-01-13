@@ -59,7 +59,8 @@ function varargout=grace2plmt(Pcenter,Rlevel,Ldata,units,forcenew)
 % EXAMPLE: to make a new save file when you have added more months
 % [potcoffs,thedates]=grace2plmt('CSR','RL06',60,'SD',1);
 %
-% Last modified by charig-at-email.arizona.edu, 1/12/2025
+% Last modified by williameclee-at-arizona.edu, 01/13/2026
+% Last modified by charig-at-email.arizona.edu, 5/18/2022
 % Last modified by lashokkumar-at-arizona.edu, 11/09/2020
 % Last modified by mlubeck-at-email.arizona.edu, 03/18/2019
 % Last modified by fjsimons-at-alum.mit.edu, 05/17/2011
@@ -118,7 +119,17 @@ if strcmp(Pcenter,'GFZ')
         errornames=ls2cell(fullfile(ddir1,'GSM*G---_005a.txt'));
         % Know a priori what the bandwidth of the coefficients is
         Ldata=90;
-    end      
+    elseif strcmp(Rlevel,'RL06')
+       if Ldata == 60
+           datanames=[ls2cell(fullfile(ddir1,'GSM*GRAC*BA01_0600')) ls2cell(fullfile(ddir1,'GSM*GRFO*BA01_060*'))];
+        elseif Ldata == 96
+            datanames=[ls2cell(fullfile(ddir1,'GSM*GRAC*BB01_0600')) ls2cell(fullfile(ddir1,'GSM*GRFO*BB01_060*'))];
+       else
+           error(['Solutions with requested L=' num2str(Ldata) ' not currently stored']);
+       end   
+    else
+        error('GFZ %s solutions not currently stored', Rlevel);
+    end   
 elseif  strcmp(Pcenter,'CSR')
     if strcmp(Rlevel,'RL04')
        datanames=ls2cell(fullfile(ddir1,'GSM*0060_0004'));
@@ -130,9 +141,9 @@ elseif  strcmp(Pcenter,'CSR')
        % 11/12/2023 GR-FO only now version 6.2
        % 1/12/2025 GR-FO only now version 6.3
        if Ldata == 60
-           datanames=[ls2cell(fullfile(ddir1,'GSM*GRAC*BA01_0600')) ls2cell(fullfile(ddir1,'GSM*GRFO*BA01_0603'))];
-       elseif Ldata == 96
-           datanames=[ls2cell(fullfile(ddir1,'GSM*GRAC*BB01_0600')) ls2cell(fullfile(ddir1,'GSM*GRFO*BB01_0603'))];
+           datanames=[ls2cell(fullfile(ddir1,'GSM*GRAC*BA01_0600')) ls2cell(fullfile(ddir1,'GSM*GRFO*BA01_060*'))];
+        elseif Ldata == 96
+            datanames=[ls2cell(fullfile(ddir1,'GSM*GRAC*BB01_0600')) ls2cell(fullfile(ddir1,'GSM*GRFO*BB01_060*'))];
        else
            error(['Solutions with requested L=' num2str(Ldata) ' not currently stored']);
        end
@@ -147,16 +158,31 @@ elseif  strcmp(Pcenter,'CSR')
        % maximum 2 digits and vv represents the maximum 2 digit version 
        % number. So for RL06 the nomenclature is 0600 instead of 0006 for
        % Rl05 previosly. The PID naming convention stays the same.    
+    else
+        error('CSR %s solutions not currently stored', Rlevel);
     end
     % Know a priori what the bandwidth of the coefficients is
     % Ldata=60;
 elseif  strcmp(Pcenter,'JPL')
-    if strcmp(Rlevel,'RL05')
+    if strcmp(Rlevel,'RL04')
+       error('JPL RL04 solutions not currently stored');
+    elseif strcmp(Rlevel,'RL05')
        datanames=ls2cell(fullfile(ddir1,'GSM*JPLEM*0005'));
        % JPL Release Level 5 has no calibrated error files
        %errornames=ls2cell(fullfile(ddir1,'GSM*0060_0004.txt'));
+    elseif strcmp(Rlevel,'RL06')
+       % 5/12/2022 GR-FO only now version 6.1
+       % 11/12/2023 GR-FO only now version 6.2
+       % 1/12/2025 GR-FO only now version 6.3
+       if Ldata == 60
+           datanames=[ls2cell(fullfile(ddir1,'GSM*GRAC*BA01_0600')) ls2cell(fullfile(ddir1,'GSM*GRFO*BA01_060*'))];
+        elseif Ldata == 96
+            datanames=[ls2cell(fullfile(ddir1,'GSM*GRAC*BB01_0600')) ls2cell(fullfile(ddir1,'GSM*GRFO*BB01_060*'))];
+       else
+           error(['Solutions with requested L=' num2str(Ldata) ' not currently stored']);
+       end
     else
-        error('JPL RL04 solutions not currently stored');
+        error('JPL %s solutions not currently stored', Rlevel);
     %elseif strcmp(Rlevel,'RL05');
     %    datanames=ls2cell(fullfile(ddir1,'GSM*JPLEM*005'));
     end
@@ -264,7 +290,7 @@ for index = 1:nmonths
     Carray = Carray(:,2:7);
     lmcosi_month=cellfun(@str2num,Carray);
     % This should be addmup(Ldata)
-    [m,n] = size(lmcosi_month);
+    [m,~] = size(lmcosi_month);
     
     if strcmp(Pcenter,'GFZ') || strcmp(Pcenter,'CSR')
         % Change the order of the coefficients so that 
@@ -285,7 +311,7 @@ for index = 1:nmonths
         % Some JPL months are only degree 60, so add in zeros to get up to
         % degree 90
         ldim=length(lmcosi_month);
-        if max(lmcosi_month(:,1))==60
+        if max(lmcosi_month(:,1)) < Ldata
             [~,~,~,lmcosiE]=addmon(Ldata);
             lmcosi_month = [lmcosi_month;...
                             lmcosiE(ldim+1:end,1:2) zeros(length(lmcosiE)-ldim,4)];
@@ -401,7 +427,7 @@ if (strcmp(Pcenter,'CSR') || strcmp(Pcenter,'JPL')) && (strcmp(Rlevel,'RL05')...
     % Only want columns 2-5, and as format double
     Earray = Earray(:,2:5);
     cal_errors_month=cellfun(@str2num,Earray);
-    [m,n] = size(cal_errors_month);
+    [m,~] = size(cal_errors_month);
     
     % Change the order of the coefficients so that 
     % order m goes as [0 01 012 0123 ...]
@@ -453,7 +479,7 @@ if (strcmp(Pcenter,'CSR') || strcmp(Pcenter,'JPL')) && (strcmp(Rlevel,'RL05')...
     end
     
     % If from the GFZ data center, add terms for l=0 and 1
-    if Pcenter == 'GFZ'
+    if strcmp(Pcenter,'GFZ')
       cal_errors_month = [0 0 0 0; 1 0 0 0; 1 1 0 0; cal_errors_month];
     end
     
