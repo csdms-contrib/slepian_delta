@@ -59,7 +59,7 @@ function varargout=grace2plmt(Pcenter,Rlevel,Ldata,units,forcenew)
 % EXAMPLE: to make a new save file when you have added more months
 % [potcoffs,thedates]=grace2plmt('CSR','RL06',60,'SD',1);
 %
-% Last modified by williameclee-at-arizona.edu, 01/13/2026
+% Last modified by williameclee-at-arizona.edu, 01/14/2026
 % Last modified by charig-at-email.arizona.edu, 5/18/2022
 % Last modified by lashokkumar-at-arizona.edu, 11/09/2020
 % Last modified by mlubeck-at-email.arizona.edu, 03/18/2019
@@ -119,14 +119,19 @@ if strcmp(Pcenter,'GFZ')
         errornames=ls2cell(fullfile(ddir1,'GSM*G---_005a.txt'));
         % Know a priori what the bandwidth of the coefficients is
         Ldata=90;
-    elseif strcmp(Rlevel,'RL06')
+    elseif contains(Rlevel,'RL06')
+        if strcmpi(Rlevel,'RL06')
+            gfo_ver = '060*';
+        else
+            gfo_ver = sprintf('060%s', Rlevel(end));
+        end
        if Ldata == 60
-           datanames=[ls2cell(fullfile(ddir1,'GSM*GRAC*BA01_0600')) ls2cell(fullfile(ddir1,'GSM*GRFO*BA01_060*'))];
+           datanames=[ls2cell(fullfile(ddir1,'GSM*GRAC*BA01_0600')) ls2cell(fullfile(ddir1,sprintf('GSM*GRFO*BA01_%s', gfo_ver)))];
         elseif Ldata == 96
-            datanames=[ls2cell(fullfile(ddir1,'GSM*GRAC*BB01_0600')) ls2cell(fullfile(ddir1,'GSM*GRFO*BB01_060*'))];
+            datanames=[ls2cell(fullfile(ddir1,'GSM*GRAC*BB01_0600')) ls2cell(fullfile(ddir1,sprintf('GSM*GRFO*BB01_%s', gfo_ver)))];
        else
            error(['Solutions with requested L=' num2str(Ldata) ' not currently stored']);
-       end   
+       end
     else
         error('GFZ %s solutions not currently stored', Rlevel);
     end   
@@ -136,14 +141,19 @@ elseif  strcmp(Pcenter,'CSR')
        errornames=ls2cell(fullfile(ddir1,'GSM*0060_0004.txt'));
     elseif strcmp(Rlevel,'RL05')
        datanames=ls2cell(fullfile(ddir1,'GSM*0060_0005'));
-    elseif strcmp(Rlevel,'RL06')
+    elseif contains(Rlevel,'RL06')
        % 5/12/2022 GR-FO only now version 6.1
        % 11/12/2023 GR-FO only now version 6.2
        % 1/12/2025 GR-FO only now version 6.3
+       if strcmpi(Rlevel,'RL06')
+            gfo_ver = '060*';
+        else
+            gfo_ver = sprintf('060%s', Rlevel(end));
+        end
        if Ldata == 60
-           datanames=[ls2cell(fullfile(ddir1,'GSM*GRAC*BA01_0600')) ls2cell(fullfile(ddir1,'GSM*GRFO*BA01_060*'))];
+           datanames=[ls2cell(fullfile(ddir1,'GSM*GRAC*BA01_0600')) ls2cell(fullfile(ddir1,sprintf('GSM*GRFO*BA01_%s', gfo_ver)))];
         elseif Ldata == 96
-            datanames=[ls2cell(fullfile(ddir1,'GSM*GRAC*BB01_0600')) ls2cell(fullfile(ddir1,'GSM*GRFO*BB01_060*'))];
+            datanames=[ls2cell(fullfile(ddir1,'GSM*GRAC*BB01_0600')) ls2cell(fullfile(ddir1,sprintf('GSM*GRFO*BB01_%s', gfo_ver)))];
        else
            error(['Solutions with requested L=' num2str(Ldata) ' not currently stored']);
        end
@@ -170,14 +180,19 @@ elseif  strcmp(Pcenter,'JPL')
        datanames=ls2cell(fullfile(ddir1,'GSM*JPLEM*0005'));
        % JPL Release Level 5 has no calibrated error files
        %errornames=ls2cell(fullfile(ddir1,'GSM*0060_0004.txt'));
-    elseif strcmp(Rlevel,'RL06')
+    elseif contains(Rlevel,'RL06')
        % 5/12/2022 GR-FO only now version 6.1
        % 11/12/2023 GR-FO only now version 6.2
        % 1/12/2025 GR-FO only now version 6.3
+       if strcmpi(Rlevel,'RL06')
+            gfo_ver = '060*';
+        else
+            gfo_ver = sprintf('060%s', Rlevel(end));
+        end
        if Ldata == 60
-           datanames=[ls2cell(fullfile(ddir1,'GSM*GRAC*BA01_0600')) ls2cell(fullfile(ddir1,'GSM*GRFO*BA01_060*'))];
+           datanames=[ls2cell(fullfile(ddir1,'GSM*GRAC*BA01_0600')) ls2cell(fullfile(ddir1,sprintf('GSM*GRFO*BA01_%s', gfo_ver)))];
         elseif Ldata == 96
-            datanames=[ls2cell(fullfile(ddir1,'GSM*GRAC*BB01_0600')) ls2cell(fullfile(ddir1,'GSM*GRFO*BB01_060*'))];
+            datanames=[ls2cell(fullfile(ddir1,'GSM*GRAC*BB01_0600')) ls2cell(fullfile(ddir1,sprintf('GSM*GRFO*BB01_%s', gfo_ver)))];
        else
            error(['Solutions with requested L=' num2str(Ldata) ' not currently stored']);
        end
