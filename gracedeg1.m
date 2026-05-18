@@ -33,7 +33,7 @@ function varargout=gracedeg1(Pcenter,Rlevel)
 %   the TN-13 document is newer, then we use it to create a new .mat file
 %   and then load the .mat file.
 %
-% Last modified by charig-at-arizona.edu, 11/18/2021
+% Last modified by charig-at-arizona.edu, 5/18/2026
 
 % Determine parameters and set defaults
 defval('Pcenter','CSR')
@@ -49,8 +49,8 @@ defval('ddir2',fullfile(getenv('IFILES'),'GRACE','Degree1'));
 
 % The name of the original data files
 if strcmp(Rlevel,'RL06')
-    fnpl1=sprintf('%s/TN-13_GEOC_%s_%s.txt',ddir1,Pcenter,'RL0602');
-    fnpl2=sprintf('%s/TN-13_GEOC_%s_%s.mat',ddir2,Pcenter,'RL0602');
+    fnpl1=sprintf('%s/TN-13_GEOC_%s_%s.txt',ddir1,Pcenter,'RL0603');
+    fnpl2=sprintf('%s/TN-13_GEOC_%s_%s.mat',ddir2,Pcenter,'RL0603');
 elseif strcmp(Rlevel,'RL05')
     fnpl1=sprintf('%s/deg1_RL05_NH.txt',ddir1);
     fnpl2=sprintf('%s/deg1_RL05_NH.mat',ddir2);
