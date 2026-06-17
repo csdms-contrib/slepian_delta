@@ -108,10 +108,6 @@ if ~isstr(TH) && length(TH)==1 % POLAR CAPS
     end 
         
 else % GEOGRAPHICAL REGIONS and XY REGIONS
-    % Check if you want the Shannon number of eigenfunctions
-    if strcmp(J,'N')
-       J = round((Lwindow+1)^2*spharea(TH));
-    end
     if isstr(TH) % Geographic
         % Here, TH gets passed to glmalpha, and glmalpha will interpret
         % either the cell of the region
@@ -123,6 +119,10 @@ else % GEOGRAPHICAL REGIONS and XY REGIONS
         end
     else % Closed coordinates (make a hash)
         h=hash(TH,'sha1');
+    end
+    % Check if you want the Shannon number of eigenfunctions
+    if strcmp(J,'N')
+       J = round((Lwindow+1)^2*spharea(TH));
     end
     % The name of the save file
     if lp
